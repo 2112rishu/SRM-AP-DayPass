@@ -1,0 +1,14 @@
+{
+  "name": "srm-ap-daypass",
+  "version": "1.0.0",
+  "description": "SRM AP DayPass full-stack demo application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "firebase-admin": "^14.4.0"
+  }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - SRM AP DayPass</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">🎓 SRM AP DayPass</a>
+        <a href="student-login.html" class="btn btn-outline-primary btn-sm">Student Login</a>
+    </div>
+</nav>
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h1>Admin Login</h1>
+        <p class="small-muted">Authorized administrators only.</p>
+
+        <div id="message"></div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label class="form-label">Admin Email</label>
+                <input id="email" type="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input id="password" type="password" class="form-control" required>
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Admin Login</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const message = document.getElementById("message");
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    message.innerHTML = `<div class="alert alert-info">Checking admin account...</div>`;
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+
+        const snap = await db.collection("students").doc(auth.currentUser.uid).get();
+
+        if (!snap.exists || snap.data().role !== "admin") {
+            await auth.signOut();
+            throw new Error("This account does not have admin access.");
+        }
+
+        if (snap.data().accountStatus === "BLOCKED") {
+            await auth.signOut();
+            throw new Error("Admin account is blocked.");
+        }
+
+        window.location.href = "admin.html";
+    } catch (error) {
+        console.error(error);
+        message.innerHTML =
+            `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`;
+    }
+});
+</script>
+
+</body>
+</html>

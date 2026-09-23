@@ -1,0 +1,283 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+.navbar {
+    background: #ffffff !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    padding: 14px 22px;
+}
+
+.navbar-brand {
+    color: #1769e0 !important;
+    font-weight: 800;
+    font-size: 21px;
+}
+
+.nav-link {
+    font-weight: 600;
+    color: #374151 !important;
+}
+
+.nav-link:hover {
+    color: #1769e0 !important;
+}
+
+.container {
+    max-width: 1150px;
+}
+
+.page-wrap {
+    padding: 45px 0;
+}
+
+.hero {
+    padding: 70px 0;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+}
+
+.hero h1 span {
+    color: #1769e0;
+}
+
+.hero p {
+    color: #6b7280;
+    font-size: 18px;
+    max-width: 700px;
+}
+
+.card,
+.panel,
+.stat-card,
+.qr-card {
+    background: #fff;
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 5px 22px rgba(15, 23, 42, .08);
+}
+
+.card {
+    padding: 25px;
+}
+
+.panel {
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.portal-card {
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.portal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .12);
+}
+
+.icon-box {
+    width: 55px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: #eaf2ff;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    border-radius: 9px;
+    font-weight: 700;
+    padding: 10px 17px;
+}
+
+.btn-primary {
+    background: #1769e0;
+    border-color: #1769e0;
+}
+
+.btn-primary:hover {
+    background: #0d55bd;
+    border-color: #0d55bd;
+}
+
+.form-control,
+.form-select {
+    border-radius: 9px;
+    padding: 11px 13px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #1769e0;
+    box-shadow: 0 0 0 3px rgba(23,105,224,.12);
+}
+
+.auth-page {
+    min-height: calc(100vh - 75px);
+    display: grid;
+    place-items: center;
+    padding: 35px 15px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(15,23,42,.1);
+}
+
+.auth-card h1 {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.welcome {
+    background: #1769e0;
+    color: #fff;
+    border-radius: 18px;
+    padding: 28px;
+    margin-bottom: 25px;
+}
+
+.welcome h1,
+.welcome p {
+    color: #fff;
+}
+
+.stat-card {
+    padding: 22px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1769e0;
+    margin: 0;
+}
+
+.stat-card p {
+    margin: 7px 0 0;
+    color: #6b7280;
+}
+
+.qr-card {
+    padding: 28px;
+    text-align: center;
+}
+
+.qr-container {
+    display: inline-block;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin: 15px auto;
+}
+
+.qr-timer {
+    font-weight: 700;
+    color: #1769e0;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-blocked {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    border-radius: 12px;
+}
+
+.scanner-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 15px;
+    padding: 15px;
+    background: #f8fafc;
+}
+
+.result-box {
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.result-success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+.result-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.footer {
+    padding: 35px 0;
+    color: #6b7280;
+    text-align: center;
+}
+
+.small-muted {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .page-wrap {
+        padding: 25px 0;
+    }
+
+    .hero {
+        padding: 40px 0;
+    }
+
+    .auth-card {
+        padding: 23px;
+    }
+
+    .table {
+        font-size: 13px;
+    }
+}

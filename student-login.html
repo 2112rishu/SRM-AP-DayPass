@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - SRM AP DayPass</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">🎓 SRM AP DayPass</a>
+        <a href="admin-login.html" class="btn btn-outline-primary btn-sm">Admin Login</a>
+    </div>
+</nav>
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h1>Student Login</h1>
+        <p class="small-muted">Use the email and password provided by the administrator.</p>
+
+        <div id="message"></div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input id="email" type="email" class="form-control" required placeholder="student@gmail.com">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <input id="password" type="password" class="form-control" required>
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">Show</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Login</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById("loginForm");
+const message = document.getElementById("message");
+
+document.getElementById("togglePassword").onclick = () => {
+    const input = document.getElementById("password");
+    input.type = input.type === "password" ? "text" : "password";
+    document.getElementById("togglePassword").textContent =
+        input.type === "password" ? "Show" : "Hide";
+};
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    message.innerHTML = `<div class="alert alert-info">Logging in...</div>`;
+
+    try {
+        const credential = await auth.signInWithEmailAndPassword(email, password);
+
+        const snap = await db.collection("students").doc(credential.user.uid).get();
+
+        if (!snap.exists) {
+            await auth.signOut();
+            throw new Error("Student profile not found.");
+        }
+
+        const profile = snap.data();
+
+        if (profile.role !== "student") {
+            await auth.signOut();
+            throw new Error("This account is not a student account.");
+        }
+
+        if (profile.accountStatus === "BLOCKED") {
+            await auth.signOut();
+            throw new Error("Your account is blocked. Contact the administrator.");
+        }
+
+        window.location.href = "dashboard.html";
+    } catch (error) {
+        console.error(error);
+        message.innerHTML =
+            `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`;
+    }
+});
+</script>
+
+</body>
+</html>
