@@ -1,140 +1,1128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - SRM AP DayPass</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <title>Student Dashboard - SRM AP DayPass</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
     <script src="firebase-config.js"></script>
+
+    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background: #14213d;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #14213d, #1d3557);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .qr-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            min-height: 220px;
+        }
+
+        #qrWarning {
+            display: none;
+        }
+
+        .timer {
+            font-size: 22px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .info-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-<nav class="navbar">
-    <div class="container d-flex align-items-center">
-        <a class="navbar-brand" href="dashboard.html">🎓 SRM AP DayPass</a>
-        <div class="ms-auto d-flex gap-2">
-            <a href="history.html" class="btn btn-outline-primary btn-sm">History</a>
-            <button class="btn btn-primary btn-sm" onclick="logout()">Logout</button>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-dark">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand"
+            href="dashboard.html"
+        >
+            SRM AP DayPass
+        </a>
+
+
+        <div>
+
+            <a
+                href="history.html"
+                class="btn btn-outline-light btn-sm me-2"
+            >
+                Entry History
+            </a>
+
+
+            <button
+                class="btn btn-danger btn-sm"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
         </div>
+
     </div>
+
 </nav>
 
-<main class="container page-wrap">
-    <div class="welcome">
-        <h1 id="welcomeName">Student Dashboard</h1>
-        <p id="studentDetails" class="mb-0">Loading student details...</p>
+
+<!-- ================= MAIN ================= -->
+
+<div class="container py-4">
+
+
+    <!-- WELCOME -->
+
+    <div class="welcome-card mb-4">
+
+        <h2>
+
+            Welcome,
+            <span id="studentName">
+                Student
+            </span>
+            👋
+
+        </h2>
+
+        <p class="mb-1">
+            SRM AP DayPass Student Dashboard
+        </p>
+
+        <small>
+            Manage your daily campus entry pass.
+        </small>
+
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="qr-card">
-                <h2>Your Digital DayPass</h2>
-                <p class="small-muted">
-                    Show this QR code to the security/admin desk.
-                    It refreshes every 30 seconds.
-                </p>
 
-                <div id="qrContainer" class="qr-container"></div>
 
-                <div class="qr-timer">
-                    QR refreshes in <span id="timer">30</span> seconds
+    <!-- ================= STUDENT INFO ================= -->
+
+    <div class="row g-3 mb-4">
+
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Student ID
+                </h6>
+
+                <div
+                    class="fw-bold"
+                    id="studentId"
+                >
+                    Loading...
                 </div>
 
-                <div id="qrStatus" class="small-muted mt-2"></div>
             </div>
+
         </div>
 
-        <div class="col-lg-5">
-            <div class="panel h-100">
-                <h3>Student Information</h3>
-                <hr>
-                <p><strong>Student ID:</strong> <span id="studentId">-</span></p>
-                <p><strong>Email:</strong> <span id="email">-</span></p>
-                <p><strong>Status:</strong> <span id="status">-</span></p>
 
-                <a href="history.html" class="btn btn-primary w-100">
-                    View Entry History
-                </a>
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Account Status
+                </h6>
+
+                <div
+                    class="fw-bold text-success"
+                    id="accountStatus"
+                >
+                    Loading...
+                </div>
+
             </div>
+
         </div>
+
+
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Email
+                </h6>
+
+                <div
+                    class="fw-bold"
+                    id="studentEmail"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-</main>
+
+
+
+    <!-- ================= ENTRY STATS ================= -->
+
+    <div class="row g-3 mb-4">
+
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Today's Entries
+                </h6>
+
+                <div
+                    class="stat-number text-primary"
+                    id="todayEntries"
+                >
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Remaining Today
+                </h6>
+
+                <div
+                    class="stat-number text-success"
+                    id="remainingEntries"
+                >
+                    3
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-md-4">
+
+            <div class="stat-card bg-white">
+
+                <h6>
+                    Daily Limit
+                </h6>
+
+                <div
+                    class="stat-number text-dark"
+                >
+                    3
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= QR CARD ================= -->
+
+    <div class="card qr-card mb-4">
+
+        <div class="card-body text-center">
+
+
+            <h3>
+                🎫 Your Entry QR Code
+            </h3>
+
+
+            <p class="text-muted">
+                Show this QR code at the security gate.
+            </p>
+
+
+            <!-- QR -->
+
+            <div id="qrcode"></div>
+
+
+            <!-- TIMER -->
+
+            <div class="mt-3">
+
+                <div class="timer-label">
+                    QR Code refreshes in
+                </div>
+
+                <div
+                    class="timer"
+                    id="qrTimer"
+                >
+                    30 seconds
+                </div>
+
+            </div>
+
+
+            <p class="text-muted mt-2">
+
+                A new QR code is generated
+                automatically every 30 seconds.
+
+            </p>
+
+
+            <!-- REFRESH -->
+
+            <button
+                class="btn btn-primary"
+                onclick="generateQR()"
+            >
+                🔄 Refresh QR Now
+            </button>
+
+
+
+            <!-- ================= WARNING ================= -->
+
+            <div
+                id="qrWarning"
+                class="alert alert-danger mt-4 mb-0"
+            >
+
+                <strong>
+                    🚫 Daily Limit Reached
+                </strong>
+
+                <br>
+
+                Daily entry limit reached.
+                Maximum 3 entries allowed per day.
+
+                <hr>
+
+                <strong>
+                    Entry Limit:
+                </strong>
+
+                3
+
+                <br>
+
+                <strong>
+                    Remaining:
+                </strong>
+
+                <span id="warningRemaining">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= HISTORY ================= -->
+
+    <div class="text-center mb-4">
+
+        <a
+            href="history.html"
+            class="btn btn-dark"
+        >
+            📋 View Entry History
+        </a>
+
+    </div>
+
+
+
+    <!-- ================= INSTRUCTIONS ================= -->
+
+    <div class="card info-card">
+
+        <div class="card-body">
+
+            <h4>
+                📌 Instructions
+            </h4>
+
+            <ol>
+
+                <li>
+                    Generate your QR code.
+                </li>
+
+                <li>
+                    Show the QR code to security.
+                </li>
+
+                <li>
+                    Security scans and verifies your QR.
+                </li>
+
+                <li>
+                    You can enter the campus a maximum
+                    of <strong>3 times per day.</strong>
+                </li>
+
+                <li>
+                    Check Entry History to see your
+                    successful entries.
+                </li>
+
+            </ol>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 
 <script>
-let student = null;
-let timerInterval = null;
 
-async function loadDashboard() {
-    try {
-        await requireRole("student");
 
-        const data = await getMyProfile();
-        student = data.profile;
+/* =====================================================
+   VARIABLES
+===================================================== */
 
-        document.getElementById("welcomeName").textContent =
-            `Welcome, ${student.name}`;
+let currentStudent = null;
 
-        document.getElementById("studentDetails").textContent =
-            `${student.studentId} • ${student.status || "Student"}`;
+const DAILY_LIMIT = 3;
 
-        document.getElementById("studentId").textContent = student.studentId;
-        document.getElementById("email").textContent = student.email;
-        document.getElementById("status").innerHTML =
-            `<span class="status-badge status-active">${escapeHtml(student.accountStatus)}</span>`;
+const QR_DURATION = 30;
 
-        generateQr();
-    } catch (error) {
-        console.error(error);
-    }
-}
+let qrSeconds = QR_DURATION;
 
-function generateQr() {
-    const container = document.getElementById("qrContainer");
-    container.innerHTML = "";
+let qrTimerInterval = null;
 
-    const encodedStudentId = btoa(student.studentId);
-    const timeSlot = Math.floor(Date.now() / 1000 / 30);
-    const qrData = `SRMAP|${encodedStudentId}|${timeSlot}`;
 
-    new QRCode(container, {
-        text: qrData,
-        width: 230,
-        height: 230,
-        correctLevel: QRCode.CorrectLevel.M
-    });
 
-    document.getElementById("qrStatus").textContent =
-        "QR code is active and ready for verification.";
+/* =====================================================
+   INDIA DATE
+===================================================== */
 
-    startTimer();
-}
+function getIndiaDate() {
 
-function startTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-
-    function update() {
-        const secondsIntoSlot = Math.floor(Date.now() / 1000) % 30;
-        const remaining = 30 - secondsIntoSlot;
-
-        document.getElementById("timer").textContent = remaining;
-
-        if (remaining === 30 || remaining <= 1) {
-            generateQr();
+    return new Intl.DateTimeFormat(
+        "en-CA",
+        {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
         }
-    }
+    ).format(new Date());
 
-    update();
-    timerInterval = setInterval(update, 1000);
 }
 
-loadDashboard();
+
+
+/* =====================================================
+   LOAD STUDENT
+===================================================== */
+
+async function loadStudent() {
+
+    try {
+
+        const user = auth.currentUser;
+
+
+        if (!user) {
+
+            window.location.href =
+                "student-login.html";
+
+            return;
+
+        }
+
+
+        const token =
+            await user.getIdToken(true);
+
+
+        const response =
+            await fetch(
+                "/api/me",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
+            );
+
+
+        const text =
+            await response.text();
+
+
+        let data = {};
+
+
+        try {
+
+            data = JSON.parse(text);
+
+        } catch {
+
+            throw new Error(
+                "Invalid server response."
+            );
+
+        }
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Unable to load student profile."
+            );
+
+        }
+
+
+        currentStudent = data.user;
+
+
+        /* ADMIN */
+
+        if (
+            currentStudent.role ===
+            "admin"
+        ) {
+
+            window.location.href =
+                "admin.html";
+
+            return;
+
+        }
+
+
+        /* STUDENT DETAILS */
+
+        document.getElementById(
+            "studentName"
+        ).textContent =
+            currentStudent.name ||
+            "Student";
+
+
+        document.getElementById(
+            "studentId"
+        ).textContent =
+            currentStudent.studentId ||
+            "-";
+
+
+        document.getElementById(
+            "studentEmail"
+        ).textContent =
+            currentStudent.email ||
+            "-";
+
+
+        document.getElementById(
+            "accountStatus"
+        ).textContent =
+            currentStudent.accountStatus ||
+            currentStudent.status ||
+            "ACTIVE";
+
+
+        /* LOAD ENTRIES */
+
+        await loadTodayEntries();
+
+
+        /* GENERATE QR */
+
+        generateQR();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Student loading error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to load dashboard."
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   LOAD TODAY'S ENTRIES
+===================================================== */
+
+async function loadTodayEntries() {
+
+    try {
+
+        const user =
+            auth.currentUser;
+
+
+        if (
+            !user ||
+            !currentStudent
+        ) {
+
+            return;
+
+        }
+
+
+        const token =
+            await user.getIdToken(true);
+
+
+        const response =
+            await fetch(
+
+                `/api/entries/${encodeURIComponent(
+                    currentStudent.studentId
+                )}`,
+
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
+
+            );
+
+
+        const text =
+            await response.text();
+
+
+        let data = {};
+
+
+        try {
+
+            data = JSON.parse(text);
+
+        }
+
+        catch {
+
+            throw new Error(
+                "Invalid history response."
+            );
+
+        }
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Unable to load entry history."
+            );
+
+        }
+
+
+        const entries =
+            Array.isArray(data.entries)
+                ? data.entries
+                : [];
+
+
+        const today =
+            getIndiaDate();
+
+
+        const todayEntries =
+            entries.filter(
+                entry => {
+
+                    return (
+
+                        entry.entryDate ===
+                        today &&
+
+                        entry.verificationStatus ===
+                        "SUCCESS"
+
+                    );
+
+                }
+            );
+
+
+        const count =
+            todayEntries.length;
+
+
+        const remaining =
+            Math.max(
+                0,
+                DAILY_LIMIT - count
+            );
+
+
+        /* DISPLAY */
+
+        document.getElementById(
+            "todayEntries"
+        ).textContent =
+            count;
+
+
+        document.getElementById(
+            "remainingEntries"
+        ).textContent =
+            remaining;
+
+
+        document.getElementById(
+            "warningRemaining"
+        ).textContent =
+            remaining;
+
+
+        /* WARNING */
+
+        const warning =
+            document.getElementById(
+                "qrWarning"
+            );
+
+
+        if (
+            count >= DAILY_LIMIT
+        ) {
+
+            warning.style.display =
+                "block";
+
+        }
+
+        else {
+
+            warning.style.display =
+                "none";
+
+        }
+
+
+        console.log(
+            "Today's entries:",
+            count
+        );
+
+
+        console.log(
+            "Remaining:",
+            remaining
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Entry history error:",
+            error
+        );
+
+
+        /*
+        Do not falsely show
+        daily limit if history
+        cannot be loaded.
+        */
+
+        document.getElementById(
+            "todayEntries"
+        ).textContent =
+            "0";
+
+
+        document.getElementById(
+            "remainingEntries"
+        ).textContent =
+            "3";
+
+
+        document.getElementById(
+            "warningRemaining"
+        ).textContent =
+            "3";
+
+
+        document.getElementById(
+            "qrWarning"
+        ).style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   GENERATE QR
+===================================================== */
+
+function generateQR() {
+
+    if (!currentStudent) {
+
+        return;
+
+    }
+
+
+    const qrContainer =
+        document.getElementById(
+            "qrcode"
+        );
+
+
+    qrContainer.innerHTML = "";
+
+
+    /*
+    QR DATA
+    */
+
+    const qrData =
+        JSON.stringify({
+
+            studentId:
+                currentStudent.studentId,
+
+            name:
+                currentStudent.name,
+
+            timestamp:
+                Date.now()
+
+        });
+
+
+    /*
+    CREATE QR
+    */
+
+    new QRCode(
+
+        qrContainer,
+
+        {
+            text: qrData,
+
+            width: 220,
+
+            height: 220,
+
+            colorDark: "#000000",
+
+            colorLight: "#ffffff",
+
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
+
+    );
+
+
+    /*
+    RESET TIMER
+    */
+
+    startQRTimer();
+
+}
+
+
+
+/* =====================================================
+   QR COUNTDOWN TIMER
+===================================================== */
+
+function startQRTimer() {
+
+    /*
+    Clear previous timer
+    */
+
+    if (qrTimerInterval) {
+
+        clearInterval(
+            qrTimerInterval
+        );
+
+    }
+
+
+    /*
+    Start from 30
+    */
+
+    qrSeconds =
+        QR_DURATION;
+
+
+    updateQRTimer();
+
+
+    /*
+    Countdown every second
+    */
+
+    qrTimerInterval =
+        setInterval(
+
+            function () {
+
+                qrSeconds--;
+
+                updateQRTimer();
+
+
+                /*
+                When timer reaches 0
+                */
+
+                if (
+                    qrSeconds <= 0
+                ) {
+
+                    clearInterval(
+                        qrTimerInterval
+                    );
+
+
+                    /*
+                    Generate new QR
+                    */
+
+                    generateQR();
+
+                }
+
+            },
+
+            1000
+
+        );
+
+}
+
+
+
+/* =====================================================
+   UPDATE TIMER TEXT
+===================================================== */
+
+function updateQRTimer() {
+
+    const timer =
+        document.getElementById(
+            "qrTimer"
+        );
+
+
+    if (!timer) {
+
+        return;
+
+    }
+
+
+    timer.textContent =
+        qrSeconds +
+        " seconds";
+
+}
+
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout() {
+
+    try {
+
+        if (qrTimerInterval) {
+
+            clearInterval(
+                qrTimerInterval
+            );
+
+        }
+
+
+        await auth.signOut();
+
+
+        window.location.href =
+            "index.html";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   FIREBASE AUTH
+===================================================== */
+
+auth.onAuthStateChanged(
+
+    function (user) {
+
+        if (!user) {
+
+            window.location.href =
+                "student-login.html";
+
+            return;
+
+        }
+
+
+        loadStudent();
+
+    }
+
+);
+
 </script>
 
+
 </body>
+
 </html>

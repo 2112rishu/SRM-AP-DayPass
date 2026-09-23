@@ -1,19 +1,21 @@
 const express = require("express");
-const cors = require("cors");
 const path = require("path");
 
-console.log("🔥 THIS IS THE NEW SERVER.JS");
-
 const { initializeApp, cert } = require("firebase-admin/app");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const {
+    getFirestore,
+    FieldValue
+} = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* =====================================================
-   FIREBASE ADMIN SETUP
-   ===================================================== */
+console.log("🔥 SRM AP DAYPASS SERVER - ENTRY SYSTEM ENABLED");
+
+// --------------------------------------------------
+// FIREBASE ADMIN SETUP
+// --------------------------------------------------
 
 function getServiceAccount() {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
@@ -30,72 +32,41 @@ initializeApp({
 });
 
 const db = getFirestore();
-const auth = getAuth();
+const adminAuth = getAuth();
 
-/* =====================================================
-   MIDDLEWARE
-   ===================================================== */
+// --------------------------------------------------
+// MIDDLEWARE
+// --------------------------------------------------
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
+// --------------------------------------------------
+// AUTH MIDDLEWARE
+// --------------------------------------------------
 
-/* =====================================================
-   SERVE FRONTEND FILES
-   ===================================================== */
-
-app.use(express.static(__dirname));
-
-/* =====================================================
-   HOME PAGE
-   ===================================================== */
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-
-/* =====================================================
-   API STATUS
-   ===================================================== */
-
-app.get("/api/status", (req, res) => {
-    res.json({
-        success: true,
-        message: "SRM AP DayPass API is running."
-    });
-});
-
-/* =====================================================
-   VERIFY FIREBASE TOKEN
-   ===================================================== */
-
-async function verifyToken(req, res, next) {
+async function requireAuth(req, res, next) {
     try {
-        const authorization = req.headers.authorization || "";
+        const authHeader = req.headers.authorization || "";
 
-        if (!authorization.startsWith("Bearer ")) {
+        if (!authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 success: false,
                 message: "Authentication required."
             });
         }
 
-        const token = authorization.substring(7);
+        const token = authHeader.substring(7);
 
-        const decodedToken = await auth.verifyIdToken(token);
+        const decodedToken = await adminAuth.verifyIdToken(token);
 
         req.user = decodedToken;
 
         next();
-
     } catch (error) {
-        console.error("Token verification error:", error);
+        console.error("Authentication error:", error);
 
         return res.status(401).json({
             success: false,
@@ -104,57 +75,68 @@ async function verifyToken(req, res, next) {
     }
 }
 
-/* =====================================================
-   VERIFY ADMIN
-   ===================================================== */
+// --------------------------------------------------
+// ADMIN MIDDLEWARE
+// --------------------------------------------------
 
-async function verifyAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
     try {
-        const userDoc = await db
+        const doc = await db
             .collection("students")
             .doc(req.user.uid)
             .get();
 
-        if (!userDoc.exists) {
+        if (!doc.exists) {
             return res.status(403).json({
                 success: false,
-                message: "User profile not found."
+                message: "Admin profile not found."
             });
         }
 
-        const userData = userDoc.data();
+        const user = doc.data();
 
-        if (userData.role !== "admin") {
+        if (user.role !== "admin") {
             return res.status(403).json({
                 success: false,
                 message: "Admin access required."
             });
         }
 
-        if (userData.accountStatus === "BLOCKED") {
-            return res.status(403).json({
-                success: false,
-                message: "Account is blocked."
-            });
-        }
-
         next();
-
     } catch (error) {
-        console.error("Admin verification error:", error);
+        console.error("Admin check error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Unable to verify admin."
+            message: "Unable to verify admin access."
         });
     }
 }
 
-/* =====================================================
-   GET CURRENT USER PROFILE
-   ===================================================== */
+// --------------------------------------------------
+// HOME
+// --------------------------------------------------
 
-app.get("/api/me", verifyToken, async (req, res) => {
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// --------------------------------------------------
+// API STATUS
+// --------------------------------------------------
+
+app.get("/api/status", (req, res) => {
+    res.json({
+        success: true,
+        message: "SRM AP DayPass API is running."
+    });
+});
+
+// --------------------------------------------------
+// GET CURRENT USER
+// --------------------------------------------------
+
+app.get("/api/me", requireAuth, async (req, res) => {
     try {
         const doc = await db
             .collection("students")
@@ -175,90 +157,109 @@ app.get("/api/me", verifyToken, async (req, res) => {
                 ...doc.data()
             }
         });
-
     } catch (error) {
-        console.error("Profile error:", error);
+        console.error("/api/me error:", error);
 
         res.status(500).json({
             success: false,
-            message: "Unable to load profile."
+            message: "Unable to load user profile."
         });
     }
 });
 
-/* =====================================================
-   ADMIN - ADD STUDENT
-   ===================================================== */
+// --------------------------------------------------
+// ADMIN - GET ALL STUDENTS
+// --------------------------------------------------
 
-app.post("/api/admin/students", verifyToken, verifyAdmin, async (req, res) => {
-    try {
-        const {
-            studentId,
-            name,
-            email,
-            password,
-            status
-        } = req.body;
-
-        if (!studentId || !name || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Student ID, name, email and password are required."
-            });
-        }
-
-        if (password.length < 6) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must contain at least 6 characters."
-            });
-        }
-
-        /* Check duplicate Student ID */
-
-        const existingStudent = await db
-            .collection("students")
-            .where("studentId", "==", studentId)
-            .limit(1)
-            .get();
-
-        if (!existingStudent.empty) {
-            return res.status(400).json({
-                success: false,
-                message: "Student ID already exists."
-            });
-        }
-
-        /* Create Firebase Auth account */
-
-        let firebaseUser;
-
+app.get(
+    "/api/admin/students",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
         try {
-            firebaseUser = await auth.createUser({
-                email: email,
-                password: password,
+            const snapshot = await db
+                .collection("students")
+                .orderBy("createdAt", "desc")
+                .get();
+
+            const students = [];
+
+            snapshot.forEach(doc => {
+                students.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+
+            res.json({
+                success: true,
+                students
+            });
+        } catch (error) {
+            console.error("Get students error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to load students."
+            });
+        }
+    }
+);
+
+// --------------------------------------------------
+// ADMIN - CREATE STUDENT
+// --------------------------------------------------
+
+app.post(
+    "/api/students",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const {
+                studentId,
+                name,
+                email,
+                password,
+                status
+            } = req.body;
+
+            if (!studentId || !name || !email || !password) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Student ID, name, email and password are required."
+                });
+            }
+
+            // Check duplicate student ID
+            const existing = await db
+                .collection("students")
+                .where("studentId", "==", studentId)
+                .limit(1)
+                .get();
+
+            if (!existing.empty) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Student ID already exists."
+                });
+            }
+
+            // Create Firebase Auth account
+            const firebaseUser = await adminAuth.createUser({
+                email,
+                password,
                 displayName: name
             });
 
-        } catch (error) {
-            console.error("Firebase Auth error:", error);
-
-            return res.status(400).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        /* Create Firestore profile */
-
-        try {
+            // Create Firestore profile
             await db
                 .collection("students")
                 .doc(firebaseUser.uid)
                 .set({
-                    studentId: studentId,
-                    name: name,
-                    email: email,
+                    studentId,
+                    name,
+                    email,
                     status: status || "Day Scholar",
                     role: "student",
                     accountStatus: "ACTIVE",
@@ -267,82 +268,36 @@ app.post("/api/admin/students", verifyToken, verifyAdmin, async (req, res) => {
 
             res.json({
                 success: true,
-                message: "Student created successfully.",
-                uid: firebaseUser.uid
+                message: "Student account created successfully.",
+                student: {
+                    uid: firebaseUser.uid,
+                    studentId,
+                    name,
+                    email
+                }
             });
-
         } catch (error) {
+            console.error("Create student error:", error);
 
-            /* Remove Auth account if Firestore fails */
-
-            try {
-                await auth.deleteUser(firebaseUser.uid);
-            } catch (deleteError) {
-                console.error("Cleanup error:", deleteError);
-            }
-
-            throw error;
-        }
-
-    } catch (error) {
-        console.error("Create student error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to create student."
-        });
-    }
-});
-
-/* =====================================================
-   ADMIN - GET STUDENTS
-   ===================================================== */
-
-app.get("/api/students", verifyToken, verifyAdmin, async (req, res) => {
-    try {
-
-        const snapshot = await db
-            .collection("students")
-            .where("role", "==", "student")
-            .get();
-
-        const students = [];
-
-        snapshot.forEach(doc => {
-            students.push({
-                id: doc.id,
-                ...doc.data()
+            res.status(500).json({
+                success: false,
+                message: error.message || "Unable to create student."
             });
-        });
-
-        res.json({
-            success: true,
-            students: students
-        });
-
-    } catch (error) {
-        console.error("Get students error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to load students."
-        });
+        }
     }
-});
+);
 
-/* =====================================================
-   ADMIN - BLOCK / UNBLOCK STUDENT
-   ===================================================== */
+// --------------------------------------------------
+// ADMIN - BLOCK / UNBLOCK STUDENT
+// --------------------------------------------------
 
 app.patch(
     "/api/students/:studentId/status",
-    verifyToken,
-    verifyAdmin,
+    requireAuth,
+    requireAdmin,
     async (req, res) => {
-
         try {
-
-            const studentId = req.params.studentId;
+            const { studentId } = req.params;
             const { accountStatus } = req.body;
 
             if (!["ACTIVE", "BLOCKED"].includes(accountStatus)) {
@@ -365,22 +320,25 @@ app.patch(
                 });
             }
 
-            const studentDoc = snapshot.docs[0];
+            const doc = snapshot.docs[0];
 
-            await studentDoc.ref.update({
-                accountStatus: accountStatus
+            await doc.ref.update({
+                accountStatus
+            });
+
+            await adminAuth.updateUser(doc.id, {
+                disabled: accountStatus !== "ACTIVE"
             });
 
             res.json({
                 success: true,
                 message:
-                    accountStatus === "BLOCKED"
-                        ? "Student blocked successfully."
-                        : "Student unblocked successfully."
+                    accountStatus === "ACTIVE"
+                        ? "Student account activated."
+                        : "Student account blocked."
             });
-
         } catch (error) {
-            console.error("Status update error:", error);
+            console.error("Student status error:", error);
 
             res.status(500).json({
                 success: false,
@@ -390,63 +348,37 @@ app.patch(
     }
 );
 
-/* =====================================================
-   VERIFY DAYPASS QR
-   ===================================================== */
+// --------------------------------------------------
+// GET TODAY'S DATE KEY
+// India timezone: Asia/Kolkata
+// --------------------------------------------------
 
-app.post("/api/verify-qr", verifyToken, async (req, res) => {
+function getIndiaDateKey() {
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(new Date());
+}
+
+// --------------------------------------------------
+// VERIFY QR + RECORD ENTRY
+// MAXIMUM 3 SUCCESSFUL ENTRIES PER DAY
+// --------------------------------------------------
+
+app.post("/api/verify-qr", requireAuth, async (req, res) => {
     try {
+        const { studentId } = req.body;
 
-        const { qrData } = req.body;
-
-        if (!qrData) {
+        if (!studentId) {
             return res.status(400).json({
                 success: false,
-                message: "QR data is required."
+                message: "Student ID is required."
             });
         }
 
-        const parts = qrData.split("|");
-
-        if (
-            parts.length !== 3 ||
-            parts[0] !== "SRMAP"
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid SRM AP DayPass QR."
-            });
-        }
-
-        const encodedStudentId = parts[1];
-        const qrTimeSlot = Number(parts[2]);
-
-        let studentId;
-
-        try {
-            studentId = Buffer
-                .from(encodedStudentId, "base64")
-                .toString("utf8");
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid QR data."
-            });
-        }
-
-        const currentTimeSlot =
-            Math.floor(Date.now() / 1000 / 30);
-
-        if (
-            qrTimeSlot !== currentTimeSlot &&
-            qrTimeSlot !== currentTimeSlot - 1
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "QR code has expired."
-            });
-        }
-
+        // Find student
         const snapshot = await db
             .collection("students")
             .where("studentId", "==", studentId)
@@ -463,20 +395,108 @@ app.post("/api/verify-qr", verifyToken, async (req, res) => {
         const studentDoc = snapshot.docs[0];
         const student = studentDoc.data();
 
-        if (student.accountStatus === "BLOCKED") {
+        // Check blocked account
+        if (student.accountStatus !== "ACTIVE") {
             return res.status(403).json({
                 success: false,
-                message: "Student account is blocked."
+                message: "Student account is blocked.",
+                student: {
+                    studentId: student.studentId,
+                    name: student.name,
+                    email: student.email
+                }
             });
         }
 
+        const dateKey = getIndiaDateKey();
+
+        /*
+         * One counter document per student per day.
+         *
+         * Example:
+         * entryCounters/SRMAP-STU-1001_2026-09-23
+         */
+        const counterId = `${student.studentId}_${dateKey}`;
+
+        const counterRef = db
+            .collection("entryCounters")
+            .doc(counterId);
+
+        const entryRef = db
+            .collection("entries")
+            .doc();
+
+        let entryNumber;
+
+        await db.runTransaction(async transaction => {
+            const counterDoc = await transaction.get(counterRef);
+
+            let currentCount = 0;
+
+            if (counterDoc.exists) {
+                currentCount = counterDoc.data().count || 0;
+            }
+
+            // Maximum 3 entries per day
+            if (currentCount >= 3) {
+                throw new Error("DAILY_LIMIT_REACHED");
+            }
+
+            entryNumber = currentCount + 1;
+
+            // Update counter
+            transaction.set(
+                counterRef,
+                {
+                    studentId: student.studentId,
+                    date: dateKey,
+                    count: entryNumber,
+                    updatedAt: FieldValue.serverTimestamp()
+                },
+                { merge: true }
+            );
+
+            // Create successful entry
+            transaction.set(entryRef, {
+                studentId: student.studentId,
+                name: student.name,
+                email: student.email || "",
+                status: student.status || "",
+                entryNumber,
+                entryDate: dateKey,
+                verificationStatus: "SUCCESS",
+                verifiedBy: req.user.uid,
+                createdAt: FieldValue.serverTimestamp()
+            });
+        });
+
+        console.log(
+            `✅ ENTRY SUCCESS: ${student.studentId} - Entry ${entryNumber}/3`
+        );
+
         res.json({
             success: true,
-            message: "QR verified successfully.",
-            student: student
+            message: `Entry ${entryNumber} successful.`,
+            entry: {
+                entryNumber,
+                entryLimit: 3,
+                remainingEntries: 3 - entryNumber,
+                studentId: student.studentId,
+                name: student.name,
+                date: dateKey
+            }
         });
 
     } catch (error) {
+
+        if (error.message === "DAILY_LIMIT_REACHED") {
+            return res.status(429).json({
+                success: false,
+                message: "Daily entry limit reached. Maximum 3 entries allowed per day.",
+                entryLimit: 3,
+                remainingEntries: 0
+            });
+        }
 
         console.error("QR verification error:", error);
 
@@ -487,219 +507,127 @@ app.post("/api/verify-qr", verifyToken, async (req, res) => {
     }
 });
 
-/* =====================================================
-   SAVE ENTRY
-   ===================================================== */
+// --------------------------------------------------
+// GET ENTRY HISTORY
+// --------------------------------------------------
 
-app.post("/api/entries", verifyToken, async (req, res) => {
+app.get("/api/entries", requireAuth, async (req, res) => {
     try {
-
-        const {
-            studentId,
-            studentName,
-            entryType
-        } = req.body;
-
-        if (!studentId) {
-            return res.status(400).json({
-                success: false,
-                message: "Student ID is required."
-            });
-        }
-
-        const entry = {
-            studentId: studentId,
-            studentName: studentName || "",
-            entryType: entryType || "ENTRY",
-            scannedBy: req.user.uid,
-            timestamp: FieldValue.serverTimestamp()
-        };
-
-        const document = await db
-            .collection("entries")
-            .add(entry);
-
-        res.json({
-            success: true,
-            message: "Entry recorded successfully.",
-            entryId: document.id
-        });
-
-    } catch (error) {
-
-        console.error("Save entry error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to save entry."
-        });
-    }
-});
-
-/* =====================================================
-   ADMIN - GET ALL ENTRIES
-   ===================================================== */
-
-app.get("/api/entries", verifyToken, verifyAdmin, async (req, res) => {
-    try {
-
         const snapshot = await db
             .collection("entries")
-            .limit(200)
+            .orderBy("createdAt", "desc")
+            .limit(100)
             .get();
 
         const entries = [];
 
         snapshot.forEach(doc => {
+            const data = doc.data();
+
             entries.push({
                 id: doc.id,
-                ...doc.data()
+                ...data
             });
-        });
-
-        entries.sort((a, b) => {
-
-            const timeA =
-                a.timestamp && a.timestamp.toMillis
-                    ? a.timestamp.toMillis()
-                    : 0;
-
-            const timeB =
-                b.timestamp && b.timestamp.toMillis
-                    ? b.timestamp.toMillis()
-                    : 0;
-
-            return timeB - timeA;
         });
 
         res.json({
             success: true,
-            entries: entries
+            entries
         });
 
     } catch (error) {
-
-        console.error("Get entries error:", error);
+        console.error("Entry history error:", error);
 
         res.status(500).json({
             success: false,
-            message: "Unable to load entries."
+            message: "Unable to load entry history."
         });
     }
 });
 
-/* =====================================================
-   STUDENT - GET OWN HISTORY
-   ===================================================== */
+// --------------------------------------------------
+// GET ENTRY HISTORY FOR PARTICULAR STUDENT
+// --------------------------------------------------
 
-app.get("/api/entries/:studentId", verifyToken, async (req, res) => {
-    try {
+app.get(
+    "/api/entries/:studentId",
+    requireAuth,
+    async (req, res) => {
+        try {
+            const { studentId } = req.params;
 
-        const requestedStudentId =
-            req.params.studentId;
+            const snapshot = await db
+                .collection("entries")
+                .where("studentId", "==", studentId)
+                .get();
 
-        const profile = await db
-            .collection("students")
-            .doc(req.user.uid)
-            .get();
+            const entries = [];
 
-        if (!profile.exists) {
-            return res.status(404).json({
-                success: false,
-                message: "Profile not found."
+            snapshot.forEach(doc => {
+                entries.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
             });
-        }
 
-        const user = profile.data();
-
-        if (
-            user.role !== "admin" &&
-            user.studentId !== requestedStudentId
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied."
-            });
-        }
-
-        const snapshot = await db
-            .collection("entries")
-            .where("studentId", "==", requestedStudentId)
-            .get();
-
-        const entries = [];
-
-        snapshot.forEach(doc => {
-            entries.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-
-        entries.sort((a, b) => {
-
-            const timeA =
-                a.timestamp && a.timestamp.toMillis
-                    ? a.timestamp.toMillis()
+            // Sort newest first
+            entries.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis
+                    ? a.createdAt.toMillis()
                     : 0;
 
-            const timeB =
-                b.timestamp && b.timestamp.toMillis
-                    ? b.timestamp.toMillis()
+                const bTime = b.createdAt?.toMillis
+                    ? b.createdAt.toMillis()
                     : 0;
 
-            return timeB - timeA;
-        });
+                return bTime - aTime;
+            });
 
-        res.json({
-            success: true,
-            entries: entries
-        });
+            res.json({
+                success: true,
+                entries
+            });
 
-    } catch (error) {
+        } catch (error) {
+            console.error("Student entry history error:", error);
 
-        console.error("History error:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to load history."
-        });
+            res.status(500).json({
+                success: false,
+                message: "Unable to load student entry history."
+            });
+        }
     }
-});
+);
 
-/* =====================================================
-   API 404
-   ===================================================== */
+// --------------------------------------------------
+// API 404
+// --------------------------------------------------
 
 app.use("/api", (req, res) => {
     res.status(404).json({
         success: false,
-        message: "API endpoint not found."
+        message: "API route not found."
     });
 });
 
-/* =====================================================
-   GENERAL ERROR HANDLER
-   ===================================================== */
+// --------------------------------------------------
+// ERROR HANDLER
+// --------------------------------------------------
 
 app.use((error, req, res, next) => {
-
     console.error("Server error:", error);
 
     res.status(500).json({
         success: false,
-        message: "Server error."
+        message: "Internal server error."
     });
 });
 
-/* =====================================================
-   START SERVER
-   ===================================================== */
+// --------------------------------------------------
+// START SERVER
+// --------------------------------------------------
 
-app.listen(PORT, "0.0.0.0", () => {
-
-    console.log(
-        `SRM AP DayPass server running on http://localhost:${PORT}`
-    );
-
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌐 http://localhost:${PORT}`);
 });

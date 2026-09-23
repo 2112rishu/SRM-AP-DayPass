@@ -3,99 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entry History - SRM AP DayPass</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <title>Entry History - SRM AP DayPass</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
     <script src="firebase-config.js"></script>
+
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .page-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .entry-success {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .entry-number {
+            font-weight: bold;
+        }
+
+        .empty-box {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+        }
+
+        .limit-card {
+            background: #eef6ff;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+        }
+    </style>
 </head>
+
 <body>
 
-<nav class="navbar">
+<nav class="navbar navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand" href="dashboard.html">🎓 SRM AP DayPass</a>
-        <div class="ms-auto d-flex gap-2">
-            <a href="dashboard.html" class="btn btn-outline-primary btn-sm">Dashboard</a>
-            <button class="btn btn-primary btn-sm" onclick="logout()">Logout</button>
+        <span class="navbar-brand fw-bold">
+            🎓 SRM AP DayPass
+        </span>
+
+        <div>
+            <a href="dashboard.html" class="btn btn-light btn-sm me-2">
+                Dashboard
+            </a>
+
+            <button onclick="logout()" class="btn btn-outline-light btn-sm">
+                Logout
+            </button>
         </div>
     </div>
 </nav>
 
-<main class="container page-wrap">
-    <div class="panel">
-        <h1>My Entry History</h1>
-        <p id="studentInfo" class="small-muted">Loading...</p>
+<div class="container py-4">
 
-        <div id="message"></div>
+    <div class="page-card">
 
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered align-middle">
-                <thead>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Entry History</h2>
+                <p class="text-muted mb-0">
+                    Record of successful DayPass entries
+                </p>
+            </div>
+
+            <button
+                onclick="loadHistory()"
+                class="btn btn-primary"
+            >
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Daily Limit -->
+        <div class="limit-card">
+            <div class="row text-center">
+
+                <div class="col-md-4">
+                    <h5 class="mb-1">Daily Limit</h5>
+                    <h3 class="fw-bold">3</h3>
+                </div>
+
+                <div class="col-md-4">
+                    <h5 class="mb-1">Today's Entries</h5>
+                    <h3 class="fw-bold" id="todayCount">0</h3>
+                </div>
+
+                <div class="col-md-4">
+                    <h5 class="mb-1">Remaining</h5>
+                    <h3 class="fw-bold" id="remainingCount">3</h3>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">
+                Loading entry history...
+            </p>
+        </div>
+
+        <!-- Error -->
+        <div
+            id="errorBox"
+            class="alert alert-danger d-none"
+        ></div>
+
+        <!-- Empty -->
+        <div
+            id="emptyBox"
+            class="empty-box d-none"
+        >
+            <h4>No entries yet</h4>
+            <p>
+                Successful QR verifications will appear here.
+            </p>
+        </div>
+
+        <!-- Table -->
+        <div
+            id="tableContainer"
+            class="table-responsive d-none"
+        >
+            <table class="table table-hover align-middle">
+
+                <thead class="table-primary">
                     <tr>
+                        <th>#</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Entry Type</th>
-                        <th>Verified</th>
+                        <th>Entry</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="historyBody">
-                    <tr>
-                        <td colspan="4" class="text-center">Loading...</td>
-                    </tr>
+
+                <tbody id="historyTable">
                 </tbody>
+
             </table>
         </div>
+
     </div>
-</main>
+
+</div>
 
 <script>
-async function loadHistory() {
-    try {
-        await requireRole("student");
 
-        const data = await getMyProfile();
-        const profile = data.profile;
+    let currentUser = null;
+    let currentProfile = null;
 
-        document.getElementById("studentInfo").textContent =
-            `${profile.name} • ${profile.studentId}`;
+    // -----------------------------------------
+    // WAIT FOR LOGIN
+    // -----------------------------------------
 
-        const result = await apiRequest(
-            `/api/entries/${encodeURIComponent(profile.studentId)}`
-        );
+    auth.onAuthStateChanged(async function(user) {
 
-        const body = document.getElementById("historyBody");
-
-        if (!result.entries.length) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-muted">
-                        No entries recorded yet.
-                    </td>
-                </tr>
-            `;
+        if (!user) {
+            window.location.href = "index.html";
             return;
         }
 
-        body.innerHTML = result.entries.map(entry => `
-            <tr>
-                <td>${escapeHtml(entry.date || "-")}</td>
-                <td>${escapeHtml(entry.time || "-")}</td>
-                <td>${escapeHtml(entry.entryType || "ENTRY")}</td>
-                <td><span class="status-badge status-active">Verified</span></td>
-            </tr>
-        `).join("");
+        currentUser = user;
 
-    } catch (error) {
-        console.error(error);
-        document.getElementById("message").innerHTML =
-            `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`;
+        try {
+
+            const token = await user.getIdToken();
+
+            const response = await fetch("/api/me", {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+
+            currentProfile = data.user;
+
+            await loadHistory();
+
+        } catch (error) {
+
+            console.error(error);
+
+            showError(
+                error.message || "Unable to load profile."
+            );
+        }
+
+    });
+
+
+    // -----------------------------------------
+    // LOAD HISTORY
+    // -----------------------------------------
+
+    async function loadHistory() {
+
+        document
+            .getElementById("loading")
+            .classList.remove("d-none");
+
+        document
+            .getElementById("errorBox")
+            .classList.add("d-none");
+
+        document
+            .getElementById("emptyBox")
+            .classList.add("d-none");
+
+        document
+            .getElementById("tableContainer")
+            .classList.add("d-none");
+
+        try {
+
+            const token = await currentUser.getIdToken();
+
+            let url = "/api/entries";
+
+            // Student sees only their own entries
+            if (
+                currentProfile &&
+                currentProfile.role !== "admin"
+            ) {
+                url =
+                    "/api/entries/" +
+                    encodeURIComponent(
+                        currentProfile.studentId
+                    );
+            }
+
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                    "Unable to load history."
+                );
+            }
+
+            displayEntries(data.entries || []);
+
+        } catch (error) {
+
+            console.error(error);
+
+            showError(
+                error.message ||
+                "Unable to load entry history."
+            );
+
+        } finally {
+
+            document
+                .getElementById("loading")
+                .classList.add("d-none");
+        }
     }
-}
 
-loadHistory();
+
+    // -----------------------------------------
+    // DISPLAY ENTRIES
+    // -----------------------------------------
+
+    function displayEntries(entries) {
+
+        const table =
+            document.getElementById("historyTable");
+
+        table.innerHTML = "";
+
+        if (entries.length === 0) {
+
+            document
+                .getElementById("emptyBox")
+                .classList.remove("d-none");
+
+            updateDailyCount([]);
+
+            return;
+        }
+
+        document
+            .getElementById("tableContainer")
+            .classList.remove("d-none");
+
+        entries.forEach(function(entry, index) {
+
+            const row =
+                document.createElement("tr");
+
+            const date =
+                entry.entryDate || "-";
+
+            const time =
+                getEntryTime(entry);
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+
+                <td>
+                    <strong>
+                        ${escapeHTML(entry.studentId || "-")}
+                    </strong>
+                </td>
+
+                <td>
+                    ${escapeHTML(entry.name || "-")}
+                </td>
+
+                <td>
+                    ${escapeHTML(date)}
+                </td>
+
+                <td>
+                    ${escapeHTML(time)}
+                </td>
+
+                <td class="entry-number">
+                    Entry ${entry.entryNumber || "-"} / 3
+                </td>
+
+                <td class="entry-success">
+                    ✓ SUCCESS
+                </td>
+            `;
+
+            table.appendChild(row);
+
+        });
+
+        updateDailyCount(entries);
+    }
+
+
+    // -----------------------------------------
+    // TODAY'S COUNT
+    // -----------------------------------------
+
+    function updateDailyCount(entries) {
+
+        const today =
+            new Intl.DateTimeFormat(
+                "en-CA",
+                {
+                    timeZone: "Asia/Kolkata",
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit"
+                }
+            ).format(new Date());
+
+        const todayEntries =
+            entries.filter(function(entry) {
+
+                return entry.entryDate === today;
+
+            });
+
+        const count = todayEntries.length;
+
+        document.getElementById(
+            "todayCount"
+        ).textContent = count;
+
+        document.getElementById(
+            "remainingCount"
+        ).textContent =
+            Math.max(0, 3 - count);
+    }
+
+
+    // -----------------------------------------
+    // GET TIME
+    // -----------------------------------------
+
+    function getEntryTime(entry) {
+
+        if (
+            entry.createdAt &&
+            entry.createdAt._seconds
+        ) {
+
+            const date =
+                new Date(
+                    entry.createdAt._seconds * 1000
+                );
+
+            return date.toLocaleTimeString(
+                "en-IN",
+                {
+                    timeZone: "Asia/Kolkata",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                }
+            );
+        }
+
+        return "-";
+    }
+
+
+    // -----------------------------------------
+    // ERROR
+    // -----------------------------------------
+
+    function showError(message) {
+
+        const box =
+            document.getElementById("errorBox");
+
+        box.textContent = message;
+
+        box.classList.remove("d-none");
+    }
+
+
+    // -----------------------------------------
+    // HTML SECURITY
+    // -----------------------------------------
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    // -----------------------------------------
+    // LOGOUT
+    // -----------------------------------------
+
+    async function logout() {
+
+        await auth.signOut();
+
+        window.location.href =
+            "index.html";
+    }
+
 </script>
 
 </body>

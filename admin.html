@@ -1,381 +1,1257 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SRM AP DayPass</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
 
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
+    <title>SRM AP DayPass - Admin Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background: #f4f6f9;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            height: 100%;
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+        }
+
+        .status-badge {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .active-badge {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .blocked-badge {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .admin-info {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .message-box {
+            display: none;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .student-id {
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
 
-<nav class="navbar">
-    <div class="container">
-        <a class="navbar-brand" href="admin.html">🎓 SRM AP DayPass</a>
+    <!-- ================= NAVBAR ================= -->
 
-        <div class="ms-auto d-flex gap-2">
-            <a href="security.html" class="btn btn-outline-primary btn-sm">QR Security</a>
-            <button class="btn btn-primary btn-sm" onclick="logout()">Logout</button>
-        </div>
-    </div>
-</nav>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
 
-<main class="container page-wrap">
-    <div class="welcome">
-        <h1>Admin Dashboard</h1>
-        <p id="adminInfo" class="mb-0">Loading administrator...</p>
-    </div>
+            <a class="navbar-brand" href="admin.html">
+                SRM AP DayPass
+            </a>
 
-    <div id="message"></div>
+            <div class="d-flex align-items-center gap-2">
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h3 id="totalStudents">0</h3>
-                <p>Total Students</p>
-            </div>
-        </div>
+                <a
+                    href="security.html"
+                    class="btn btn-outline-light btn-sm"
+                >
+                    Security
+                </a>
 
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h3 id="activeStudents">0</h3>
-                <p>Active Students</p>
-            </div>
-        </div>
+                <a
+                    href="history.html"
+                    class="btn btn-outline-light btn-sm"
+                >
+                    Entry History
+                </a>
 
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h3 id="blockedStudents">0</h3>
-                <p>Blocked Students</p>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h3 id="totalEntries">0</h3>
-                <p>Total Entries</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <h2>Add Student</h2>
-        <p class="small-muted">
-            The administrator creates the student's Firebase email/password account.
-            Any valid email provider can be used.
-        </p>
-
-        <form id="studentForm" class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Student ID</label>
-                <input id="studentId" class="form-control" required placeholder="SRMAP-STU-1001">
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Student Name</label>
-                <input id="studentName" class="form-control" required placeholder="Student Name">
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input id="studentEmail" type="email" class="form-control" required placeholder="student@gmail.com">
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Temporary Password</label>
-                <input id="studentPassword" type="text" class="form-control" value="Student@123" minlength="6" required>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Student Type</label>
-                <select id="studentStatus" class="form-select">
-                    <option>Day Scholar</option>
-                    <option>Hosteller</option>
-                </select>
-            </div>
-
-            <div class="col-md-6 d-flex align-items-end">
-                <button class="btn btn-primary w-100" type="submit">
-                    Create Student Account
+                <button
+                    class="btn btn-danger btn-sm"
+                    onclick="logout()"
+                >
+                    Logout
                 </button>
+
             </div>
-        </form>
+
+        </div>
+    </nav>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="container py-4">
+
+        <!-- HEADER -->
+
+        <div class="mb-4">
+
+            <h2>
+                Admin Dashboard
+            </h2>
+
+            <p class="admin-info">
+                Manage student accounts, security verification and entry records.
+            </p>
+
+            <div id="adminInfo" class="admin-info">
+                Loading admin information...
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="messageBox"
+            class="message-box"
+        ></div>
+
+
+        <!-- ================= SUMMARY CARDS ================= -->
+
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4">
+
+                <div class="dashboard-card">
+
+                    <h3 id="totalStudents">
+                        0
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Total Students
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="dashboard-card">
+
+                    <h3 id="activeStudents">
+                        0
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Active Students
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="dashboard-card">
+
+                    <h3 id="blockedStudents">
+                        0
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Blocked Students
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= QUICK ACTIONS ================= -->
+
+        <div class="section-card">
+
+            <h4 class="mb-3">
+                Quick Actions
+            </h4>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a
+                    href="security.html"
+                    class="btn btn-primary"
+                >
+                    📷 Security Verification
+                </a>
+
+                <a
+                    href="history.html"
+                    class="btn btn-dark"
+                >
+                    📋 View Entry History
+                </a>
+
+                <a
+                    href="dashboard.html"
+                    class="btn btn-outline-primary"
+                >
+                    🎓 Student Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= CREATE STUDENT ================= -->
+
+        <div class="section-card">
+
+            <h4 class="mb-4">
+                Create Student Account
+            </h4>
+
+            <form id="studentForm">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Student ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentId"
+                            class="form-control"
+                            placeholder="Example: SRMAP-STU-1002"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Student Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentName"
+                            class="form-control"
+                            placeholder="Enter student name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="studentEmail"
+                            class="form-control"
+                            placeholder="student@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Temporary Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="studentPassword"
+                            class="form-control"
+                            placeholder="Minimum 6 characters"
+                            minlength="6"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Student Type
+                        </label>
+
+                        <select
+                            id="studentType"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Select student type
+                            </option>
+
+                            <option value="Day Scholar">
+                                Day Scholar
+                            </option>
+
+                            <option value="Hosteller">
+                                Hosteller
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <button
+                            type="submit"
+                            id="createStudentBtn"
+                            class="btn btn-success"
+                        >
+                            Create Student Account
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ================= STUDENT LIST ================= -->
+
+        <div class="section-card">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h4 class="mb-0">
+                    Student Accounts
+                </h4>
+
+                <button
+                    class="btn btn-outline-primary btn-sm"
+                    onclick="loadStudents()"
+                >
+                    🔄 Refresh
+                </button>
+
+            </div>
+
+
+            <div
+                id="studentsLoading"
+                class="loading"
+            >
+                Loading students...
+            </div>
+
+
+            <div
+                id="studentsEmpty"
+                class="empty-message"
+                style="display:none;"
+            >
+                No student accounts found.
+            </div>
+
+
+            <div
+                id="studentsTableContainer"
+                class="table-responsive"
+                style="display:none;"
+            >
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Student ID
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="studentsTableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SYSTEM LINKS ================= -->
+
+        <div class="section-card">
+
+            <h4 class="mb-3">
+                System Pages
+            </h4>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <a
+                        href="security.html"
+                        class="btn btn-outline-primary w-100"
+                    >
+                        📷 Security Scanner
+                    </a>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <a
+                        href="history.html"
+                        class="btn btn-outline-dark w-100"
+                    >
+                        📋 Entry History
+                    </a>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <a
+                        href="index.html"
+                        class="btn btn-outline-secondary w-100"
+                    >
+                        🏠 Home
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="panel">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <div>
-                <h2 class="mb-1">Student Accounts</h2>
-                <p class="small-muted mb-0">Search, block or unblock student accounts.</p>
-            </div>
-            <input id="search" class="form-control" style="max-width:320px" placeholder="Search student..." oninput="filterStudents()">
-        </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Type</th>
-                        <th>Account</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="studentBody">
-                    <tr>
-                        <td colspan="6" class="text-center">Loading...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!-- ================= FIREBASE ================= -->
 
-    <div class="panel">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-1">Entry History</h2>
-                <p class="small-muted mb-0">Latest verified DayPass entries.</p>
-            </div>
-            <a href="security.html" class="btn btn-primary">Open QR Scanner</a>
-        </div>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody id="entryBody">
-                    <tr>
-                        <td colspan="5" class="text-center">Loading...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</main>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
-<script>
-let allStudents = [];
-let allEntries = [];
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-function showMessage(type, text) {
-    document.getElementById("message").innerHTML =
-        `<div class="alert alert-${type}">${escapeHtml(text)}</div>`;
-}
+    <script src="firebase-config.js"></script>
 
-async function loadAdmin() {
-    try {
-        const data = await requireRole("admin");
 
-        document.getElementById("adminInfo").textContent =
-            `${data.profile.name} • ${data.profile.email}`;
+    <!-- ================= SCRIPT ================= -->
 
-        await Promise.all([
-            loadStudents(),
-            loadEntries()
-        ]);
-    } catch (error) {
-        console.error(error);
-    }
-}
+    <script>
 
-async function loadStudents() {
-    try {
-        const data = await apiRequest("/api/students");
-        allStudents = Array.isArray(data.students) ? data.students : [];
-        renderStudents(allStudents);
-        updateStats();
-    } catch (error) {
-        console.error(error);
-        showMessage("danger", error.message);
-    }
-}
+        let students = [];
 
-async function loadEntries() {
-    try {
-        const data = await apiRequest("/api/entries");
-        allEntries = Array.isArray(data.entries) ? data.entries : [];
-        renderEntries(allEntries);
-        updateStats();
-    } catch (error) {
-        console.error(error);
-        showMessage("danger", error.message);
-    }
-}
 
-function updateStats() {
-    document.getElementById("totalStudents").textContent = allStudents.length;
+        // ==========================================
+        // SHOW MESSAGE
+        // ==========================================
 
-    document.getElementById("activeStudents").textContent =
-        allStudents.filter(s => s.accountStatus === "ACTIVE").length;
+        function showMessage(message, type = "success") {
 
-    document.getElementById("blockedStudents").textContent =
-        allStudents.filter(s => s.accountStatus === "BLOCKED").length;
+            const box = document.getElementById("messageBox");
 
-    document.getElementById("totalEntries").textContent = allEntries.length;
-}
+            box.style.display = "block";
 
-function renderStudents(students) {
-    const body = document.getElementById("studentBody");
+            box.className =
+                "message-box alert alert-" + type;
 
-    if (!students.length) {
-        body.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center text-muted">
-                    No students found.
-                </td>
-            </tr>
-        `;
-        return;
-    }
+            box.innerHTML = message;
 
-    body.innerHTML = students.map(student => {
-        const blocked = student.accountStatus === "BLOCKED";
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
 
-        return `
-            <tr>
-                <td>${escapeHtml(student.studentId)}</td>
-                <td>${escapeHtml(student.name)}</td>
-                <td>${escapeHtml(student.email)}</td>
-                <td>${escapeHtml(student.status || "-")}</td>
-                <td>
-                    <span class="status-badge ${blocked ? "status-blocked" : "status-active"}">
-                        ${blocked ? "BLOCKED" : "ACTIVE"}
-                    </span>
-                </td>
-                <td>
-                    <button
-                        class="btn btn-sm ${blocked ? "btn-success" : "btn-outline-danger"}"
-                        onclick="changeStatus('${escapeHtml(student.studentId)}', '${blocked ? "ACTIVE" : "BLOCKED"}')">
-                        ${blocked ? "Unblock" : "Block"}
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join("");
-}
+            setTimeout(() => {
 
-function renderEntries(entries) {
-    const body = document.getElementById("entryBody");
+                box.style.display = "none";
 
-    if (!entries.length) {
-        body.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center text-muted">
-                    No entries recorded yet.
-                </td>
-            </tr>
-        `;
-        return;
-    }
+            }, 5000);
 
-    body.innerHTML = entries.map(entry => `
-        <tr>
-            <td>${escapeHtml(entry.date || "-")}</td>
-            <td>${escapeHtml(entry.time || "-")}</td>
-            <td>${escapeHtml(entry.studentId || "-")}</td>
-            <td>${escapeHtml(entry.studentName || "-")}</td>
-            <td>${escapeHtml(entry.entryType || "ENTRY")}</td>
-        </tr>
-    `).join("");
-}
+        }
 
-function filterStudents() {
-    const query = document.getElementById("search").value.trim().toLowerCase();
 
-    const filtered = allStudents.filter(student =>
-        String(student.studentId || "").toLowerCase().includes(query) ||
-        String(student.name || "").toLowerCase().includes(query) ||
-        String(student.email || "").toLowerCase().includes(query)
-    );
+        // ==========================================
+        // ESCAPE HTML
+        // ==========================================
 
-    renderStudents(filtered);
-}
+        function escapeHtml(value) {
 
-document.getElementById("studentForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
 
-    const studentId = document.getElementById("studentId").value.trim();
-    const name = document.getElementById("studentName").value.trim();
-    const email = document.getElementById("studentEmail").value.trim().toLowerCase();
-    const password = document.getElementById("studentPassword").value;
-    const status = document.getElementById("studentStatus").value;
+        }
 
-    if (!studentId || !name || !email || !password) {
-        showMessage("danger", "Please fill all required fields.");
-        return;
-    }
 
-    try {
-        const data = await apiRequest("/api/admin/students", {
-            method: "POST",
-            body: JSON.stringify({
-                studentId,
-                name,
-                email,
-                password,
-                status
-            })
+        // ==========================================
+        // AUTH CHECK
+        // ==========================================
+
+        auth.onAuthStateChanged(async (user) => {
+
+            if (!user) {
+
+                window.location.href = "admin-login.html";
+
+                return;
+            }
+
+            try {
+
+                const profileDoc =
+                    await db.collection("students")
+                        .doc(user.uid)
+                        .get();
+
+                if (!profileDoc.exists) {
+
+                    await auth.signOut();
+
+                    window.location.href = "admin-login.html";
+
+                    return;
+                }
+
+                const profile = profileDoc.data();
+
+                if (profile.role !== "admin") {
+
+                    await auth.signOut();
+
+                    window.location.href = "student-login.html";
+
+                    return;
+                }
+
+                if (
+                    profile.accountStatus &&
+                    profile.accountStatus !== "ACTIVE"
+                ) {
+
+                    await auth.signOut();
+
+                    window.location.href = "admin-login.html";
+
+                    return;
+                }
+
+                document.getElementById("adminInfo").innerHTML =
+                    `
+                    Logged in as:
+                    <strong>${escapeHtml(profile.name || "Admin")}</strong>
+                    |
+                    ${escapeHtml(profile.email || user.email)}
+                    `;
+
+                await loadStudents();
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "Unable to load admin information.",
+                    "danger"
+                );
+
+            }
+
         });
 
-        showMessage(
-            "success",
-            `Student created. Temporary password: ${data.student.temporaryPassword}`
-        );
 
-        event.target.reset();
-        document.getElementById("studentPassword").value = "Student@123";
+        // ==========================================
+        // GET TOKEN
+        // ==========================================
 
-        await loadStudents();
-    } catch (error) {
-        console.error(error);
-        showMessage("danger", error.message);
-    }
-});
+        async function getToken() {
 
-async function changeStatus(studentId, accountStatus) {
-    const action = accountStatus === "BLOCKED" ? "block" : "unblock";
+            const user = auth.currentUser;
 
-    if (!confirm(`Are you sure you want to ${action} ${studentId}?`)) {
-        return;
-    }
+            if (!user) {
 
-    try {
-        await apiRequest(
-            `/api/students/${encodeURIComponent(studentId)}/status`,
-            {
-                method: "PATCH",
-                body: JSON.stringify({ accountStatus })
+                throw new Error("You are not logged in.");
+
             }
-        );
 
-        showMessage(
-            "success",
-            `Student ${accountStatus === "BLOCKED" ? "blocked" : "unblocked"} successfully.`
-        );
+            return await user.getIdToken(true);
 
-        await loadStudents();
-    } catch (error) {
-        console.error(error);
-        showMessage("danger", error.message);
-    }
-}
+        }
 
-loadAdmin();
-</script>
+
+        // ==========================================
+        // LOAD STUDENTS
+        // ==========================================
+
+        async function loadStudents() {
+
+            const loading =
+                document.getElementById("studentsLoading");
+
+            const empty =
+                document.getElementById("studentsEmpty");
+
+            const tableContainer =
+                document.getElementById("studentsTableContainer");
+
+            loading.style.display = "block";
+            empty.style.display = "none";
+            tableContainer.style.display = "none";
+
+            try {
+
+                const token = await getToken();
+
+                const response = await fetch(
+                    "/api/admin/students",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                "Bearer " + token
+                        }
+                    }
+                );
+
+
+                const text = await response.text();
+
+                let data = {};
+
+                try {
+
+                    data = JSON.parse(text);
+
+                } catch {
+
+                    throw new Error(
+                        "Invalid server response."
+                    );
+
+                }
+
+
+                if (!response.ok || !data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        "Unable to load students."
+                    );
+
+                }
+
+
+                students = data.students || [];
+
+
+                updateSummaryCards();
+
+
+                loading.style.display = "none";
+
+
+                if (students.length === 0) {
+
+                    empty.style.display = "block";
+
+                    return;
+                }
+
+
+                tableContainer.style.display = "block";
+
+                renderStudents();
+
+            } catch (error) {
+
+                console.error(error);
+
+                loading.style.display = "none";
+
+                showMessage(
+                    error.message ||
+                    "Unable to load students.",
+                    "danger"
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // UPDATE SUMMARY
+        // ==========================================
+
+        function updateSummaryCards() {
+
+            const total = students.length;
+
+            const active =
+                students.filter(student =>
+                    (student.accountStatus || "ACTIVE")
+                    === "ACTIVE"
+                ).length;
+
+            const blocked =
+                students.filter(student =>
+                    student.accountStatus === "BLOCKED"
+                ).length;
+
+
+            document.getElementById("totalStudents")
+                .textContent = total;
+
+            document.getElementById("activeStudents")
+                .textContent = active;
+
+            document.getElementById("blockedStudents")
+                .textContent = blocked;
+
+        }
+
+
+        // ==========================================
+        // RENDER STUDENTS
+        // ==========================================
+
+        function renderStudents() {
+
+            const tbody =
+                document.getElementById("studentsTableBody");
+
+            tbody.innerHTML = "";
+
+
+            students.forEach((student, index) => {
+
+                const status =
+                    student.accountStatus || "ACTIVE";
+
+                const isBlocked =
+                    status === "BLOCKED";
+
+
+                const statusBadge = isBlocked
+
+                    ? `
+                        <span class="status-badge blocked-badge">
+                            BLOCKED
+                        </span>
+                    `
+
+                    : `
+                        <span class="status-badge active-badge">
+                            ACTIVE
+                        </span>
+                    `;
+
+
+                const actionButton = isBlocked
+
+                    ? `
+                        <button
+                            class="btn btn-success btn-sm"
+                            onclick="changeStudentStatus(
+                                '${escapeHtml(student.studentId)}',
+                                'ACTIVE'
+                            )"
+                        >
+                            Unblock / Activate
+                        </button>
+                    `
+
+                    : `
+                        <button
+                            class="btn btn-danger btn-sm"
+                            onclick="changeStudentStatus(
+                                '${escapeHtml(student.studentId)}',
+                                'BLOCKED'
+                            )"
+                        >
+                            Block
+                        </button>
+                    `;
+
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td class="student-id">
+                        ${escapeHtml(student.studentId)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(student.name)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(student.email)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            student.studentType ||
+                            "Student"
+                        )}
+                    </td>
+
+                    <td>
+                        ${statusBadge}
+                    </td>
+
+                    <td>
+                        ${actionButton}
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+        }
+
+
+        // ==========================================
+        // CHANGE STUDENT STATUS
+        // ==========================================
+
+        async function changeStudentStatus(
+            studentId,
+            newStatus
+        ) {
+
+            const actionText =
+                newStatus === "BLOCKED"
+                    ? "block"
+                    : "unblock";
+
+
+            const confirmed = confirm(
+                `Are you sure you want to ${actionText} ${studentId}?`
+            );
+
+
+            if (!confirmed) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const token = await getToken();
+
+
+                const response = await fetch(
+                    `/api/students/${encodeURIComponent(studentId)}/status`,
+                    {
+
+                        method: "PATCH",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Authorization":
+                                "Bearer " + token
+
+                        },
+
+                        body: JSON.stringify({
+
+                            accountStatus:
+                                newStatus
+
+                        })
+
+                    }
+                );
+
+
+                const text = await response.text();
+
+                let data = {};
+
+                try {
+
+                    data = JSON.parse(text);
+
+                } catch {
+
+                    throw new Error(
+                        "Invalid server response."
+                    );
+
+                }
+
+
+                if (!response.ok || !data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        "Unable to update student status."
+                    );
+
+                }
+
+
+                showMessage(
+                    `${studentId} is now ${newStatus}.`,
+                    "success"
+                );
+
+
+                await loadStudents();
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    error.message ||
+                    "Unable to update student status.",
+                    "danger"
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // CREATE STUDENT
+        // ==========================================
+
+        document
+            .getElementById("studentForm")
+            .addEventListener(
+                "submit",
+                async function(event) {
+
+                    event.preventDefault();
+
+
+                    const button =
+                        document.getElementById(
+                            "createStudentBtn"
+                        );
+
+
+                    const studentId =
+                        document
+                            .getElementById("studentId")
+                            .value
+                            .trim();
+
+                    const name =
+                        document
+                            .getElementById("studentName")
+                            .value
+                            .trim();
+
+                    const email =
+                        document
+                            .getElementById("studentEmail")
+                            .value
+                            .trim();
+
+                    const password =
+                        document
+                            .getElementById("studentPassword")
+                            .value;
+
+                    const studentType =
+                        document
+                            .getElementById("studentType")
+                            .value;
+
+
+                    if (
+                        !studentId ||
+                        !name ||
+                        !email ||
+                        !password ||
+                        !studentType
+                    ) {
+
+                        showMessage(
+                            "Please fill all fields.",
+                            "warning"
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (password.length < 6) {
+
+                        showMessage(
+                            "Password must contain at least 6 characters.",
+                            "warning"
+                        );
+
+                        return;
+
+                    }
+
+
+                    button.disabled = true;
+
+                    button.textContent =
+                        "Creating Account...";
+
+
+                    try {
+
+                        const token =
+                            await getToken();
+
+
+                        const response =
+                            await fetch(
+                                "/api/students",
+                                {
+
+                                    method: "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        "Authorization":
+                                            "Bearer " + token
+
+                                    },
+
+                                    body: JSON.stringify({
+
+                                        studentId,
+                                        name,
+                                        email,
+                                        password,
+                                        studentType
+
+                                    })
+
+                                }
+                            );
+
+
+                        const text =
+                            await response.text();
+
+
+                        let data = {};
+
+                        try {
+
+                            data =
+                                JSON.parse(text);
+
+                        } catch {
+
+                            throw new Error(
+                                "Invalid server response."
+                            );
+
+                        }
+
+
+                        if (
+                            !response.ok ||
+                            !data.success
+                        ) {
+
+                            throw new Error(
+                                data.message ||
+                                "Unable to create student."
+                            );
+
+                        }
+
+
+                        showMessage(
+                            `Student account created successfully for ${studentId}.`,
+                            "success"
+                        );
+
+
+                        document
+                            .getElementById("studentForm")
+                            .reset();
+
+
+                        await loadStudents();
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        showMessage(
+                            error.message ||
+                            "Unable to create student account.",
+                            "danger"
+                        );
+
+                    } finally {
+
+                        button.disabled = false;
+
+                        button.textContent =
+                            "Create Student Account";
+
+                    }
+
+                }
+            );
+
+
+        // ==========================================
+        // LOGOUT
+        // ==========================================
+
+        async function logout() {
+
+            try {
+
+                await auth.signOut();
+
+                window.location.href =
+                    "index.html";
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+
+        }
+
+    </script>
 
 </body>
+
 </html>
