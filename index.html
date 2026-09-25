@@ -2,96 +2,1910 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SRM AP DayPass</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <meta
+        name="description"
+        content="SRM AP EntryPass - Secure digital day pass and campus entry verification system."
+    >
+
+    <title>SRM AP EntryPass</title>
+
+    <!-- Bootstrap -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Your Main CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* =====================================================
+           ENTRY PASS HOMEPAGE
+           ===================================================== */
+
+        :root {
+            --ep-purple: #6d4aff;
+            --ep-purple-dark: #4d32c8;
+            --ep-pink: #ff7ac8;
+            --ep-bg: #f7f7fc;
+            --ep-text: #17152a;
+            --ep-muted: #737188;
+        }
+
+        body {
+            background: var(--ep-bg);
+            color: var(--ep-text);
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+
+        .ep-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(109, 74, 255, 0.08);
+        }
+
+        .ep-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            text-decoration: none;
+            color: var(--ep-text);
+            font-weight: 800;
+        }
+
+        .ep-logo {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            color: white;
+            font-size: 21px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--ep-purple),
+                    var(--ep-pink)
+                );
+
+            box-shadow:
+                0 10px 25px rgba(109, 74, 255, 0.25);
+        }
+
+        .ep-brand-title {
+            line-height: 1.05;
+        }
+
+        .ep-brand-title strong {
+            display: block;
+            font-size: 17px;
+        }
+
+        .ep-brand-title span {
+            display: block;
+            margin-top: 3px;
+
+            color: var(--ep-muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .ep-nav-link {
+            color: var(--ep-text) !important;
+            font-weight: 600;
+        }
+
+        .ep-nav-link:hover {
+            color: var(--ep-purple) !important;
+        }
+
+        /* HERO */
+
+        .ep-hero {
+            position: relative;
+            padding: 90px 0 75px;
+
+            background:
+                radial-gradient(
+                    circle at 10% 20%,
+                    rgba(109, 74, 255, 0.13),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(255, 122, 200, 0.15),
+                    transparent 30%
+                );
+        }
+
+        .ep-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 9px 15px;
+
+            border-radius: 999px;
+
+            background: rgba(109, 74, 255, 0.09);
+            color: var(--ep-purple);
+
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .ep-badge i {
+            font-size: 14px;
+        }
+
+        .ep-title {
+            margin-top: 22px;
+
+            font-size: clamp(
+                42px,
+                6vw,
+                72px
+            );
+
+            line-height: 1.03;
+            letter-spacing: -2.5px;
+
+            font-weight: 900;
+        }
+
+        .ep-gradient-text {
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--ep-purple),
+                    var(--ep-pink)
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .ep-subtitle {
+            max-width: 650px;
+
+            margin-top: 22px;
+
+            color: var(--ep-muted);
+
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        .ep-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+
+            margin-top: 30px;
+        }
+
+        .ep-primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            padding: 14px 23px;
+
+            border: none;
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--ep-purple),
+                    var(--ep-purple-dark)
+                );
+
+            color: white;
+            text-decoration: none;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 13px 30px
+                rgba(109, 74, 255, 0.25);
+
+            transition: 0.25s ease;
+        }
+
+        .ep-primary-btn:hover {
+            transform: translateY(-3px);
+            color: white;
+
+            box-shadow:
+                0 18px 35px
+                rgba(109, 74, 255, 0.32);
+        }
+
+        .ep-secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            padding: 13px 22px;
+
+            border: 1px solid
+                rgba(109, 74, 255, 0.15);
+
+            border-radius: 15px;
+
+            background: white;
+            color: var(--ep-text);
+
+            text-decoration: none;
+            font-weight: 800;
+
+            transition: 0.25s ease;
+        }
+
+        .ep-secondary-btn:hover {
+            transform: translateY(-3px);
+
+            border-color:
+                rgba(109, 74, 255, 0.35);
+
+            color: var(--ep-purple);
+        }
+
+        /* DIGITAL PASS */
+
+        .ep-pass-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ep-pass-card {
+            width: min(390px, 100%);
+
+            position: relative;
+
+            padding: 26px;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #ffffff,
+                    #f4f0ff
+                );
+
+            border: 1px solid
+                rgba(109, 74, 255, 0.13);
+
+            box-shadow:
+                0 30px 80px
+                rgba(35, 25, 80, 0.16);
+
+            transform: rotate(2deg);
+
+            transition: 0.35s ease;
+        }
+
+        .ep-pass-card:hover {
+            transform:
+                rotate(0deg)
+                translateY(-8px);
+        }
+
+        .ep-pass-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ep-pass-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-weight: 900;
+        }
+
+        .ep-mini-logo {
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--ep-purple),
+                    var(--ep-pink)
+                );
+        }
+
+        .ep-active {
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            background: #e9fff3;
+            color: #159957;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .ep-pass-heading {
+            margin-top: 30px;
+
+            color: var(--ep-muted);
+
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ep-pass-name {
+            margin-top: 5px;
+
+            font-size: 27px;
+            font-weight: 900;
+        }
+
+        .ep-pass-id {
+            color: var(--ep-muted);
+            font-size: 13px;
+        }
+
+        .ep-qr {
+            width: 175px;
+            height: 175px;
+
+            margin: 25px auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 20px;
+
+            background: white;
+
+            border: 8px solid white;
+
+            box-shadow:
+                0 12px 30px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .ep-qr-grid {
+            width: 135px;
+            height: 135px;
+
+            position: relative;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    #111 0 5px,
+                    transparent 5px 10px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    #111 0 5px,
+                    transparent 5px 10px
+                );
+
+            opacity: 0.88;
+        }
+
+        .ep-qr-grid::before,
+        .ep-qr-grid::after {
+            content: "";
+
+            position: absolute;
+
+            width: 35px;
+            height: 35px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #111 50%,
+                    transparent 50%
+                ),
+                linear-gradient(
+                    #111 50%,
+                    transparent 50%
+                );
+
+            border: 5px solid white;
+            outline: 6px solid #111;
+        }
+
+        .ep-qr-grid::before {
+            top: 5px;
+            left: 5px;
+        }
+
+        .ep-qr-grid::after {
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .ep-scan-text {
+            text-align: center;
+
+            color: var(--ep-muted);
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ep-pass-bottom {
+            display: flex;
+            justify-content: space-between;
+
+            margin-top: 20px;
+            padding-top: 16px;
+
+            border-top: 1px dashed
+                rgba(109, 74, 255, 0.2);
+
+            font-size: 11px;
+            color: var(--ep-muted);
+        }
+
+        /* FLOATING SHAPES */
+
+        .ep-float {
+            position: absolute;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 12px 15px;
+
+            border-radius: 15px;
+
+            background: rgba(255, 255, 255, 0.9);
+
+            box-shadow:
+                0 15px 35px
+                rgba(35, 25, 80, 0.1);
+
+            backdrop-filter: blur(10px);
+
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .ep-float i {
+            color: var(--ep-purple);
+            font-size: 17px;
+        }
+
+        .ep-float-one {
+            left: -25px;
+            top: 20%;
+        }
+
+        .ep-float-two {
+            right: -20px;
+            bottom: 18%;
+        }
+
+        /* SECTION */
+
+        .ep-section {
+            padding: 90px 0;
+        }
+
+        .ep-section-title {
+            max-width: 700px;
+            margin: auto;
+
+            text-align: center;
+        }
+
+        .ep-section-title .small-title {
+            color: var(--ep-purple);
+
+            font-size: 12px;
+            font-weight: 900;
+
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ep-section-title h2 {
+            margin-top: 10px;
+
+            font-size: clamp(
+                30px,
+                4vw,
+                46px
+            );
+
+            font-weight: 900;
+            letter-spacing: -1.3px;
+        }
+
+        .ep-section-title p {
+            margin-top: 15px;
+
+            color: var(--ep-muted);
+
+            line-height: 1.7;
+        }
+
+        /* FEATURE CARDS */
+
+        .ep-feature-card {
+            height: 100%;
+
+            padding: 27px;
+
+            border-radius: 23px;
+
+            background: white;
+
+            border: 1px solid
+                rgba(109, 74, 255, 0.08);
+
+            box-shadow:
+                0 15px 45px
+                rgba(35, 25, 80, 0.06);
+
+            transition: 0.25s ease;
+        }
+
+        .ep-feature-card:hover {
+            transform: translateY(-7px);
+
+            box-shadow:
+                0 25px 55px
+                rgba(35, 25, 80, 0.1);
+        }
+
+        .ep-feature-icon {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background:
+                rgba(109, 74, 255, 0.1);
+
+            color: var(--ep-purple);
+
+            font-size: 22px;
+        }
+
+        .ep-feature-card h4 {
+            margin-top: 19px;
+
+            font-size: 19px;
+            font-weight: 850;
+        }
+
+        .ep-feature-card p {
+            margin-top: 9px;
+
+            color: var(--ep-muted);
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* HOW IT WORKS */
+
+        .ep-step {
+            position: relative;
+
+            padding: 25px;
+
+            text-align: center;
+        }
+
+        .ep-step-number {
+            width: 55px;
+            height: 55px;
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--ep-purple),
+                    var(--ep-pink)
+                );
+
+            color: white;
+
+            font-size: 19px;
+            font-weight: 900;
+
+            box-shadow:
+                0 12px 25px
+                rgba(109, 74, 255, 0.2);
+        }
+
+        .ep-step h4 {
+            margin-top: 18px;
+
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+        .ep-step p {
+            color: var(--ep-muted);
+
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        /* SECURITY SECTION */
+
+        .ep-security {
+            position: relative;
+
+            overflow: hidden;
+
+            border-radius: 32px;
+
+            padding: 55px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #21185b,
+                    #5b3bd4
+                );
+
+            box-shadow:
+                0 25px 70px
+                rgba(47, 30, 130, 0.22);
+        }
+
+        .ep-security h2 {
+            font-weight: 900;
+            font-size: 38px;
+        }
+
+        .ep-security p {
+            max-width: 650px;
+
+            color: rgba(255, 255, 255, 0.76);
+
+            line-height: 1.7;
+        }
+
+        .ep-security-list {
+            margin-top: 25px;
+        }
+
+        .ep-security-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 12px;
+
+            font-size: 14px;
+            font-weight: 650;
+        }
+
+        .ep-security-item i {
+            color: #9dffca;
+        }
+
+        /* PORTALS */
+
+        .ep-portal-card {
+            height: 100%;
+
+            padding: 28px;
+
+            border-radius: 24px;
+
+            background: white;
+
+            border: 1px solid
+                rgba(109, 74, 255, 0.09);
+
+            box-shadow:
+                0 15px 45px
+                rgba(35, 25, 80, 0.06);
+        }
+
+        .ep-portal-card i {
+            font-size: 28px;
+            color: var(--ep-purple);
+        }
+
+        .ep-portal-card h4 {
+            margin-top: 17px;
+
+            font-weight: 900;
+        }
+
+        .ep-portal-card p {
+            color: var(--ep-muted);
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* FOOTER */
+
+        .ep-footer {
+            margin-top: 50px;
+            padding: 45px 0 25px;
+
+            background: #151329;
+
+            color: white;
+        }
+
+        .ep-footer-brand {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .ep-footer p {
+            color: rgba(255, 255, 255, 0.62);
+
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .ep-footer-link {
+            color: rgba(255, 255, 255, 0.68);
+
+            text-decoration: none;
+
+            font-size: 13px;
+        }
+
+        .ep-footer-link:hover {
+            color: white;
+        }
+
+        .ep-copyright {
+            margin-top: 30px;
+            padding-top: 20px;
+
+            border-top: 1px solid
+                rgba(255, 255, 255, 0.08);
+
+            color: rgba(255, 255, 255, 0.45);
+
+            font-size: 12px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 991px) {
+
+            .ep-hero {
+                padding-top: 60px;
+            }
+
+            .ep-pass-wrapper {
+                margin-top: 55px;
+            }
+
+            .ep-float-one {
+                left: 0;
+            }
+
+            .ep-float-two {
+                right: 0;
+            }
+
+            .ep-security {
+                padding: 35px;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            .ep-title {
+                letter-spacing: -1.5px;
+            }
+
+            .ep-subtitle {
+                font-size: 16px;
+            }
+
+            .ep-actions {
+                flex-direction: column;
+            }
+
+            .ep-primary-btn,
+            .ep-secondary-btn {
+                width: 100%;
+            }
+
+            .ep-pass-card {
+                transform: none;
+            }
+
+            .ep-float {
+                display: none;
+            }
+
+            .ep-security {
+                padding: 28px 22px;
+                border-radius: 25px;
+            }
+
+            .ep-security h2 {
+                font-size: 30px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-dark bg-primary">
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+
+<nav class="navbar navbar-expand-lg ep-navbar">
+
     <div class="container">
-        <span class="navbar-brand fw-bold">
-            SRM AP DayPass
-        </span>
+
+        <a
+            href="index.html"
+            class="ep-brand"
+        >
+
+            <div class="ep-logo">
+                <i class="bi bi-qr-code-scan"></i>
+            </div>
+
+            <div class="ep-brand-title">
+                <strong>SRM AP EntryPass</strong>
+                <span>Digital Campus Entry System</span>
+            </div>
+
+        </a>
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#entryNavbar"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+            class="collapse navbar-collapse"
+            id="entryNavbar"
+        >
+
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link ep-nav-link"
+                        href="#features"
+                    >
+                        Features
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link ep-nav-link"
+                        href="#how"
+                    >
+                        How It Works
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link ep-nav-link"
+                        href="#security"
+                    >
+                        Security
+                    </a>
+                </li>
+
+                <li class="nav-item ms-lg-2">
+                    <a
+                        href="student-login.html"
+                        class="ep-primary-btn"
+                    >
+                        <i class="bi bi-person"></i>
+                        Student Login
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
     </div>
+
 </nav>
 
-<div class="container py-5">
 
-    <div class="text-center mb-5">
-        <h1 class="fw-bold">SRM AP DayPass</h1>
+<!-- =========================================================
+     HERO
+     ========================================================= -->
 
-        <p class="text-muted">
-            Digital Campus Entry Management System
-        </p>
+<section class="ep-hero">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <!-- LEFT -->
+
+            <div class="col-lg-7">
+
+                <div class="ep-badge">
+                    <i class="bi bi-stars"></i>
+                    Smart • Secure • Digital
+                </div>
+
+                <h1 class="ep-title">
+                    Your campus entry,
+                    <span class="ep-gradient-text">
+                        made simple.
+                    </span>
+                </h1>
+
+                <p class="ep-subtitle">
+                    SRM AP EntryPass is a secure digital day-pass
+                    system that makes campus entry faster,
+                    smarter and easier using verified QR codes.
+                </p>
+
+                <div class="ep-actions">
+
+                    <a
+                        href="student-login.html"
+                        class="ep-primary-btn"
+                    >
+                        <i class="bi bi-ticket-perforated"></i>
+                        Get Your Day Pass
+                    </a>
+
+                    <a
+                        href="#how"
+                        class="ep-secondary-btn"
+                    >
+                        <i class="bi bi-play-circle"></i>
+                        See How It Works
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <div class="col-lg-5">
+
+                <div class="ep-pass-wrapper">
+
+                    <div class="ep-float ep-float-one">
+                        <i class="bi bi-shield-check"></i>
+                        Securely Verified
+                    </div>
+
+                    <div class="ep-float ep-float-two">
+                        <i class="bi bi-lightning-charge"></i>
+                        Fast Entry
+                    </div>
+
+                    <div class="ep-pass-card">
+
+                        <div class="ep-pass-top">
+
+                            <div class="ep-pass-brand">
+
+                                <div class="ep-mini-logo">
+                                    <i class="bi bi-qr-code"></i>
+                                </div>
+
+                                <div>
+                                    <div>
+                                        SRM AP
+                                    </div>
+
+                                    <small
+                                        style="
+                                            color:#737188;
+                                            font-size:10px;
+                                        "
+                                    >
+                                        DIGITAL DAY PASS
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <div class="ep-active">
+                                ACTIVE
+                            </div>
+
+                        </div>
+
+                        <div class="ep-pass-heading">
+                            Student
+                        </div>
+
+                        <div class="ep-pass-name">
+                            Your Name
+                        </div>
+
+                        <div class="ep-pass-id">
+                            SRMAP-STU-1001
+                        </div>
+
+                        <div class="ep-qr">
+                            <div class="ep-qr-grid"></div>
+                        </div>
+
+                        <div class="ep-scan-text">
+                            Scan to verify campus entry
+                        </div>
+
+                        <div class="ep-pass-bottom">
+
+                            <span>
+                                <i class="bi bi-clock"></i>
+                                Valid for limited time
+                            </span>
+
+                            <span>
+                                <i class="bi bi-shield-lock"></i>
+                                Secure
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="row justify-content-center g-4">
+</section>
 
-        <div class="col-md-5">
-            <div class="card shadow h-100">
-                <div class="card-body text-center p-5">
 
-                    <div style="font-size:50px;">🎓</div>
+<!-- =========================================================
+     FEATURES
+     ========================================================= -->
 
-                    <h3 class="mt-3">Student Portal</h3>
+<section
+    class="ep-section"
+    id="features"
+>
 
-                    <p class="text-muted">
-                        Generate your DayPass QR code
+    <div class="container">
+
+        <div class="ep-section-title">
+
+            <div class="small-title">
+                Why EntryPass?
+            </div>
+
+            <h2>
+                Everything needed for
+                secure campus entry.
+            </h2>
+
+            <p>
+                A simple digital system for students,
+                security teams and administrators.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4 mt-4">
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-qr-code-scan"></i>
+                    </div>
+
+                    <h4>
+                        Secure QR Pass
+                    </h4>
+
+                    <p>
+                        Students receive a temporary,
+                        digitally signed QR code for
+                        secure campus verification.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+
+                    <h4>
+                        Server Verification
+                    </h4>
+
+                    <p>
+                        QR validity is checked by the
+                        server instead of trusting the
+                        student's browser.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+
+                    <h4>
+                        Entry History
+                    </h4>
+
+                    <p>
+                        Verified entries are securely
+                        recorded so authorized staff
+                        can review campus activity.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h4>
+                        Role Based Access
+                    </h4>
+
+                    <p>
+                        Student, Security, Admin and
+                        Super Admin accounts have
+                        different permissions.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+
+                    <h4>
+                        Fast Verification
+                    </h4>
+
+                    <p>
+                        Security staff can verify a
+                        digital pass quickly without
+                        manual approval workflows.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="ep-feature-card">
+
+                    <div class="ep-feature-icon">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+
+                    <h4>
+                        Audit Records
+                    </h4>
+
+                    <p>
+                        Important system actions are
+                        recorded for accountability
+                        and administration.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     HOW IT WORKS
+     ========================================================= -->
+
+<section
+    class="ep-section"
+    id="how"
+    style="background:#ffffff;"
+>
+
+    <div class="container">
+
+        <div class="ep-section-title">
+
+            <div class="small-title">
+                Simple Process
+            </div>
+
+            <h2>
+                Entry in four simple steps.
+            </h2>
+
+            <p>
+                No complicated manual approval process.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4 mt-4">
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-step">
+
+                    <div class="ep-step-number">
+                        01
+                    </div>
+
+                    <h4>
+                        Login
+                    </h4>
+
+                    <p>
+                        Student securely logs into
+                        their EntryPass account.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-step">
+
+                    <div class="ep-step-number">
+                        02
+                    </div>
+
+                    <h4>
+                        Generate Pass
+                    </h4>
+
+                    <p>
+                        The server creates a
+                        temporary secure QR code.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-step">
+
+                    <div class="ep-step-number">
+                        03
+                    </div>
+
+                    <h4>
+                        Scan
+                    </h4>
+
+                    <p>
+                        Security scans the student's
+                        digital QR pass.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-step">
+
+                    <div class="ep-step-number">
+                        04
+                    </div>
+
+                    <h4>
+                        Verify
+                    </h4>
+
+                    <p>
+                        The server validates the QR
+                        and records the entry.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SECURITY
+     ========================================================= -->
+
+<section
+    class="ep-section"
+    id="security"
+>
+
+    <div class="container">
+
+        <div class="ep-security">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-7">
+
+                    <div
+                        class="small-title"
+                        style="
+                            color:#bcaeff;
+                            font-size:12px;
+                            font-weight:900;
+                            letter-spacing:2px;
+                            text-transform:uppercase;
+                        "
+                    >
+                        Built With Security In Mind
+                    </div>
+
+                    <h2 class="mt-2">
+                        Your campus entry
+                        deserves protection.
+                    </h2>
+
+                    <p class="mt-3">
+                        EntryPass uses server-side verification,
+                        role-based authorization, temporary QR
+                        codes and audit records to create a
+                        stronger digital entry workflow.
+                    </p>
+
+                    <div class="ep-security-list">
+
+                        <div class="ep-security-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Temporary QR codes
+                        </div>
+
+                        <div class="ep-security-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Server-side verification
+                        </div>
+
+                        <div class="ep-security-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Firebase authentication
+                        </div>
+
+                        <div class="ep-security-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Role-based authorization
+                        </div>
+
+                        <div class="ep-security-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Entry and audit records
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-5 mt-4 mt-lg-0">
+
+                    <div
+                        style="
+                            padding:30px;
+                            border-radius:25px;
+                            background:rgba(255,255,255,0.09);
+                            border:1px solid rgba(255,255,255,0.12);
+                            text-align:center;
+                        "
+                    >
+
+                        <i
+                            class="bi bi-shield-check"
+                            style="
+                                font-size:80px;
+                                color:#ffffff;
+                            "
+                        ></i>
+
+                        <h4
+                            class="mt-3"
+                            style="font-weight:900;"
+                        >
+                            Verified Entry
+                        </h4>
+
+                        <p
+                            style="
+                                color:rgba(255,255,255,0.68);
+                                font-size:13px;
+                            "
+                        >
+                            Every verification is processed
+                            through the secure backend.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     PORTALS
+     ========================================================= -->
+
+<section class="ep-section">
+
+    <div class="container">
+
+        <div class="ep-section-title">
+
+            <div class="small-title">
+                One System
+            </div>
+
+            <h2>
+                Designed for every role.
+            </h2>
+
+            <p>
+                Each user gets the tools relevant to their
+                responsibilities.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4 mt-4">
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-portal-card">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    <h4>
+                        Student
+                    </h4>
+
+                    <p>
+                        Generate your digital day pass
                         and view your entry history.
                     </p>
 
                     <a
-                        href="/student-login.html"
-                        class="btn btn-primary w-100"
+                        href="student-login.html"
+                        class="ep-secondary-btn"
+                        style="width:100%;"
                     >
                         Student Login
                     </a>
 
                 </div>
+
             </div>
-        </div>
 
 
-        <div class="col-md-5">
-            <div class="card shadow h-100">
-                <div class="card-body text-center p-5">
+            <div class="col-md-6 col-lg-3">
 
-                    <div style="font-size:50px;">🛡️</div>
+                <div class="ep-portal-card">
 
-                    <h3 class="mt-3">Admin Portal</h3>
+                    <i class="bi bi-qr-code-scan"></i>
 
-                    <p class="text-muted">
-                        Manage students and monitor
-                        campus entries.
+                    <h4>
+                        Security
+                    </h4>
+
+                    <p>
+                        Scan and verify student QR
+                        passes at campus entry points.
                     </p>
 
                     <a
-                        href="/admin-login.html"
-                        class="btn btn-dark w-100"
+                        href="admin-login.html"
+                        class="ep-secondary-btn"
+                        style="width:100%;"
+                    >
+                        Staff Login
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-portal-card">
+
+                    <i class="bi bi-bar-chart"></i>
+
+                    <h4>
+                        Admin
+                    </h4>
+
+                    <p>
+                        Manage users, monitor entries
+                        and review system activity.
+                    </p>
+
+                    <a
+                        href="admin-login.html"
+                        class="ep-secondary-btn"
+                        style="width:100%;"
                     >
                         Admin Login
                     </a>
 
                 </div>
+
             </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="ep-portal-card">
+
+                    <i class="bi bi-stars"></i>
+
+                    <h4>
+                        Super Admin
+                    </h4>
+
+                    <p>
+                        Manage roles, accounts and
+                        higher-level system controls.
+                    </p>
+
+                    <a
+                        href="admin-login.html"
+                        class="ep-secondary-btn"
+                        style="width:100%;"
+                    >
+                        Management
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
 
-</div>
+</section>
 
-<footer class="text-center text-muted py-4">
-    <small>SRM AP DayPass — Demo Project</small>
+
+<!-- =========================================================
+     FINAL CTA
+     ========================================================= -->
+
+<section
+    class="ep-section"
+    style="padding-top:20px;"
+>
+
+    <div class="container">
+
+        <div
+            style="
+                padding:50px 25px;
+                border-radius:30px;
+                text-align:center;
+                background:#ffffff;
+                border:1px solid rgba(109,74,255,0.08);
+                box-shadow:0 20px 55px rgba(35,25,80,0.06);
+            "
+        >
+
+            <div
+                class="small-title"
+                style="
+                    color:#6d4aff;
+                    font-size:12px;
+                    font-weight:900;
+                    letter-spacing:2px;
+                    text-transform:uppercase;
+                "
+            >
+                Ready?
+            </div>
+
+            <h2
+                style="
+                    margin-top:10px;
+                    font-size:clamp(30px,4vw,46px);
+                    font-weight:900;
+                "
+            >
+                Get your digital day pass.
+            </h2>
+
+            <p
+                style="
+                    max-width:600px;
+                    margin:15px auto 25px;
+                    color:#737188;
+                    line-height:1.7;
+                "
+            >
+                Login to EntryPass and make your campus
+                entry experience faster and simpler.
+            </p>
+
+            <a
+                href="student-login.html"
+                class="ep-primary-btn"
+            >
+                <i class="bi bi-arrow-right-circle"></i>
+                Enter Student Portal
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+<footer class="ep-footer">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+
+                <div class="ep-footer-brand">
+                    <i class="bi bi-qr-code-scan"></i>
+                    SRM AP EntryPass
+                </div>
+
+                <p class="mt-3">
+                    A digital campus entry platform designed
+                    to make day-pass verification simple,
+                    fast and secure.
+                </p>
+
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+
+                <h6
+                    style="font-weight:800;"
+                >
+                    Portals
+                </h6>
+
+                <div class="mt-3 d-flex flex-column gap-2">
+
+                    <a
+                        href="student-login.html"
+                        class="ep-footer-link"
+                    >
+                        Student
+                    </a>
+
+                    <a
+                        href="admin-login.html"
+                        class="ep-footer-link"
+                    >
+                        Security
+                    </a>
+
+                    <a
+                        href="admin-login.html"
+                        class="ep-footer-link"
+                    >
+                        Admin
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+
+                <h6
+                    style="font-weight:800;"
+                >
+                    System
+                </h6>
+
+                <div class="mt-3 d-flex flex-column gap-2">
+
+                    <a
+                        href="#features"
+                        class="ep-footer-link"
+                    >
+                        Features
+                    </a>
+
+                    <a
+                        href="#how"
+                        class="ep-footer-link"
+                    >
+                        How It Works
+                    </a>
+
+                    <a
+                        href="#security"
+                        class="ep-footer-link"
+                    >
+                        Security
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="ep-copyright">
+
+            © <span id="currentYear"></span>
+            SRM AP EntryPass.
+            All rights reserved.
+
+        </div>
+
+    </div>
+
 </footer>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+<script>
+
+    // Current year
+    document.getElementById(
+        "currentYear"
+    ).textContent =
+        new Date().getFullYear();
+
+</script>
 
 </body>
 </html>

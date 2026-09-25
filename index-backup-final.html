@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SRM AP DayPass | Student Portal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(37, 99, 235, .18), transparent 30%),
+                radial-gradient(circle at 90% 85%, rgba(124, 58, 237, .18), transparent 30%),
+                #f8fafc;
+            color: #0f172a;
+        }
+
+        .login-wrapper {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDE */
+
+        .welcome-panel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 70px;
+            overflow: hidden;
+            color: white;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,.16), transparent 25%),
+                radial-gradient(circle at 85% 80%, rgba(255,255,255,.10), transparent 25%),
+                linear-gradient(135deg, #0f3c91, #2563eb 55%, #6d28d9);
+        }
+
+        .welcome-panel::before,
+        .welcome-panel::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+
+        .welcome-panel::before {
+            width: 420px;
+            height: 420px;
+            top: -170px;
+            right: -130px;
+        }
+
+        .welcome-panel::after {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -120px;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .brand-mark {
+            width: 72px;
+            height: 72px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 28px;
+            border-radius: 22px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,.15);
+            font-size: 2rem;
+            backdrop-filter: blur(15px);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        .eyebrow span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 12px #4ade80;
+        }
+
+        .welcome-content h1 {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: clamp(2.7rem, 5vw, 5rem);
+            line-height: 1.02;
+            letter-spacing: -2.5px;
+            font-weight: 800;
+        }
+
+        .welcome-content h1 span {
+            color: #bfdbfe;
+        }
+
+        .welcome-content p {
+            max-width: 580px;
+            margin: 24px 0 0;
+            color: rgba(255,255,255,.78);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 38px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border-radius: 16px;
+            background: rgba(255,255,255,.09);
+            border: 1px solid rgba(255,255,255,.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: rgba(255,255,255,.12);
+        }
+
+        .feature strong {
+            display: block;
+            font-size: .86rem;
+        }
+
+        .feature small {
+            display: block;
+            margin-top: 2px;
+            color: rgba(255,255,255,.6);
+            font-size: .72rem;
+        }
+
+        /* RIGHT SIDE */
+
+        .login-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 45px;
+            background: rgba(255,255,255,.72);
+            backdrop-filter: blur(20px);
+        }
+
+        .login-box {
+            width: min(100%, 450px);
+        }
+
+        .login-heading {
+            margin-bottom: 30px;
+        }
+
+        .login-heading .mini-logo {
+            width: 56px;
+            height: 56px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 20px;
+            border-radius: 17px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            box-shadow: 0 14px 30px rgba(37,99,235,.22);
+            font-size: 1.5rem;
+        }
+
+        .login-heading h2 {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .login-heading p {
+            margin: 8px 0 0;
+            color: #64748b;
+            font-size: .92rem;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .login-input {
+            width: 100%;
+            height: 52px;
+            padding: 0 15px 0 44px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            outline: none;
+            background: white;
+            color: #0f172a;
+            font-size: .9rem;
+            transition: .25s ease;
+        }
+
+        .login-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+        }
+
+        .login-button {
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 800;
+            font-size: .92rem;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            box-shadow: 0 12px 28px rgba(37,99,235,.22);
+            transition: .25s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 35px rgba(37,99,235,.30);
+        }
+
+        .login-button:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-box {
+            display: none;
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border-radius: 13px;
+            color: #991b1b;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+
+        .error-box.show {
+            display: block;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .staff-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 13px;
+            border-radius: 13px;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: .82rem;
+            font-weight: 700;
+            transition: .25s ease;
+        }
+
+        .staff-link:hover {
+            color: #2563eb;
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 25px;
+            color: #94a3b8;
+            font-size: .72rem;
+        }
+
+        .security-note span {
+            color: #16a34a;
+        }
+
+        .footer-text {
+            margin-top: 30px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: .7rem;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 950px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-panel {
+                min-height: 420px;
+                padding: 50px 35px;
+            }
+
+            .welcome-content h1 {
+                font-size: 3rem;
+            }
+
+            .login-panel {
+                padding: 50px 25px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .welcome-panel {
+                min-height: auto;
+                padding: 40px 22px;
+            }
+
+            .welcome-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+
+            .login-panel {
+                padding: 35px 18px;
+            }
+
+            .login-heading h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- LEFT -->
+    <section class="welcome-panel">
+
+        <div class="welcome-content">
+
+            <div class="brand-mark">
+                🎓
+            </div>
+
+            <div class="eyebrow">
+                <span></span>
+                STUDENT ACCESS PORTAL
+            </div>
+
+            <h1>
+                Your campus.<br>
+                <span>Your digital pass.</span>
+            </h1>
+
+            <p>
+                Welcome to the SRM AP DayPass student portal.
+                Generate your temporary entry QR, manage your profile,
+                and view your campus entry history from one secure place.
+            </p>
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <div class="feature-icon">🎫</div>
+                    <div>
+                        <strong>Digital DayPass</strong>
+                        <small>Temporary QR entry</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <div>
+                        <strong>Fast Verification</strong>
+                        <small>Quick gate checking</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📋</div>
+                    <div>
+                        <strong>Entry History</strong>
+                        <small>Track your visits</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔐</div>
+                    <div>
+                        <strong>Secure Access</strong>
+                        <small>Protected account</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- RIGHT -->
+    <section class="login-panel">
+
+        <div class="login-box">
+
+            <div class="login-heading">
+
+                <div class="mini-logo">
+                    🎓
+                </div>
+
+                <h2>Welcome back</h2>
+
+                <p>
+                    Sign in to access your student DayPass.
+                </p>
+
+            </div>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Student Email
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ✉
+                        </span>
+
+                        <input
+                            id="email"
+                            class="login-input"
+                            type="email"
+                            placeholder="Enter your university email"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            🔒
+                        </span>
+
+                        <input
+                            id="password"
+                            class="login-input"
+                            type="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <button
+                    id="loginButton"
+                    class="login-button"
+                    type="submit"
+                >
+                    Sign In to Student Portal
+                </button>
+
+            </form>
+
+            <div class="divider">
+                STAFF ACCESS
+            </div>
+
+            <a
+                href="admin-login.html"
+                class="staff-link"
+            >
+                🛡️
+                Staff & Security Login
+            </a>
+
+            <div class="security-note">
+                <span>●</span>
+                Secure authentication powered by Firebase
+            </div>
+
+            <div class="footer-text">
+                SRM AP DayPass • Student Entry Management System
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+
+<script>
+"use strict";
+
+const loginForm = document.getElementById("loginForm");
+const loginButton = document.getElementById("loginButton");
+const errorBox = document.getElementById("errorBox");
+
+function showError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.add("show");
+}
+
+function hideError() {
+    errorBox.textContent = "";
+    errorBox.classList.remove("show");
+}
+
+loginForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    hideError();
+
+    const email = document
+        .getElementById("email")
+        .value
+        .trim();
+
+    const password = document
+        .getElementById("password")
+        .value;
+
+    if (!email || !password) {
+        showError("Please enter your email and password.");
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = "Signing in...";
+
+    try {
+
+        const credential =
+            await auth.signInWithEmailAndPassword(
+                email,
+                password
+            );
+
+        const user = credential.user;
+
+        const token =
+            await user.getIdToken(true);
+
+        const response =
+            await fetch("/api/me", {
+                headers: {
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Unable to load account."
+            );
+        }
+
+        if (!data.user ||
+            data.user.role !== "STUDENT") {
+
+            await auth.signOut();
+
+            throw new Error(
+                "This login is for student accounts only."
+            );
+        }
+
+        if (data.user.accountStatus !== "ACTIVE") {
+
+            await auth.signOut();
+
+            throw new Error(
+                "Your account is currently blocked."
+            );
+        }
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+        let message =
+            error.message ||
+            "Login failed. Please try again.";
+
+        if (
+            error.code ===
+            "auth/invalid-credential"
+        ) {
+            message =
+                "Incorrect email or password.";
+        }
+
+        showError(message);
+
+        loginButton.disabled = false;
+        loginButton.textContent =
+            "Sign In to Student Portal";
+    }
+
+});
+</script>
+
+</body>
+</html>

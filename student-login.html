@@ -2,102 +2,541 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Login - SRM AP DayPass</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Student Login | SRM AP EntryPass</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar">
+<div class="login-page">
+
+    <div class="login-background"></div>
+
     <div class="container">
-        <a class="navbar-brand" href="index.html">🎓 SRM AP DayPass</a>
-        <a href="admin-login.html" class="btn btn-outline-primary btn-sm">Admin Login</a>
-    </div>
-</nav>
 
-<div class="auth-page">
-    <div class="auth-card">
-        <h1>Student Login</h1>
-        <p class="small-muted">Use the email and password provided by the administrator.</p>
+        <div class="row justify-content-center align-items-center min-vh-100">
 
-        <div id="message"></div>
+            <div class="col-12 col-md-7 col-lg-5">
 
-        <form id="loginForm">
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input id="email" type="email" class="form-control" required placeholder="student@gmail.com">
-            </div>
+                <div class="login-card">
 
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <input id="password" type="password" class="form-control" required>
-                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">Show</button>
+                    <!-- BRAND -->
+
+                    <div class="text-center">
+
+                        <a
+                            href="index.html"
+                            class="text-decoration-none"
+                        >
+
+                            <div class="login-logo">
+                                <i class="bi bi-qr-code-scan"></i>
+                            </div>
+
+                            <h3 class="mt-3 mb-1">
+                                SRM AP EntryPass
+                            </h3>
+
+                        </a>
+
+                        <p class="text-muted mb-4">
+                            Student Portal
+                        </p>
+
+                    </div>
+
+
+                    <!-- LOGIN FORM -->
+
+                    <form id="studentLoginForm">
+
+                        <div class="mb-3">
+
+                            <label
+                                for="email"
+                                class="form-label"
+                            >
+                                Email Address
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    class="form-control"
+                                    placeholder="Enter your email"
+                                    autocomplete="email"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="password"
+                                class="form-label"
+                            >
+                                Password
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    class="form-control"
+                                    placeholder="Enter your password"
+                                    autocomplete="current-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="togglePassword"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ERROR -->
+
+                        <div
+                            id="loginError"
+                            class="alert alert-danger d-none"
+                            role="alert"
+                        ></div>
+
+
+                        <!-- BUTTON -->
+
+                        <button
+                            type="submit"
+                            id="loginButton"
+                            class="btn btn-primary w-100 py-3"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login
+                        </button>
+
+                    </form>
+
+
+                    <!-- SECURITY NOTE -->
+
+                    <div class="login-security mt-4">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        <div>
+                            <strong>Secure Login</strong>
+
+                            <small>
+                                Your account is protected by
+                                Firebase Authentication.
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <!-- BACK -->
+
+                    <div class="text-center mt-4">
+
+                        <a
+                            href="index.html"
+                            class="text-decoration-none"
+                        >
+                            <i class="bi bi-arrow-left"></i>
+                            Back to EntryPass
+                        </a>
+
+                    </div>
+
                 </div>
+
             </div>
 
-            <button class="btn btn-primary w-100" type="submit">Login</button>
-        </form>
-
-        <div class="text-center mt-4">
-            <a href="index.html">← Back to Home</a>
         </div>
+
     </div>
+
 </div>
 
-<script>
-const form = document.getElementById("loginForm");
-const message = document.getElementById("message");
 
-document.getElementById("togglePassword").onclick = () => {
-    const input = document.getElementById("password");
-    input.type = input.type === "password" ? "text" : "password";
-    document.getElementById("togglePassword").textContent =
-        input.type === "password" ? "Show" : "Hide";
+<!-- =========================================================
+     FIREBASE LOGIN
+     ========================================================= -->
+
+<script type="module">
+
+    import {
+        initializeApp
+    } from
+    "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+
+    import {
+        getAuth,
+        signInWithEmailAndPassword
+    } from
+    "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+
+    /*
+     * IMPORTANT
+     *
+     * firebase-config.js should contain your Firebase
+     * web configuration.
+     */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCu8XDAIBqIVp_49ta4383TP4xdP-n2sbw",
+  authDomain: "srm-ap-daypass.firebaseapp.com",
+  databaseURL: "https://srm-ap-daypass-default-rtdb.firebaseio.com",
+  projectId: "srm-ap-daypass",
+  storageBucket: "srm-ap-daypass.firebasestorage.app",
+  messagingSenderId: "40857485563",
+  appId: "1:40857485563:web:0f4dd9058d3cf451b8705e",
+  measurementId: "G-WDYKW0TBFE"
 };
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
 
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
 
-    message.innerHTML = `<div class="alert alert-info">Logging in...</div>`;
+    const app =
+        initializeApp(firebaseConfig);
 
-    try {
-        const credential = await auth.signInWithEmailAndPassword(email, password);
+    const auth =
+        getAuth(app);
 
-        const snap = await db.collection("students").doc(credential.user.uid).get();
 
-        if (!snap.exists) {
-            await auth.signOut();
-            throw new Error("Student profile not found.");
+    // ========================================================
+    // ELEMENTS
+    // ========================================================
+
+    const form =
+        document.getElementById(
+            "studentLoginForm"
+        );
+
+    const emailInput =
+        document.getElementById(
+            "email"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "password"
+        );
+
+    const loginButton =
+        document.getElementById(
+            "loginButton"
+        );
+
+    const loginError =
+        document.getElementById(
+            "loginError"
+        );
+
+    const togglePassword =
+        document.getElementById(
+            "togglePassword"
+        );
+
+
+    // ========================================================
+    // PASSWORD VISIBILITY
+    // ========================================================
+
+    togglePassword.addEventListener(
+        "click",
+        () => {
+
+            const isPassword =
+                passwordInput.type === "password";
+
+            passwordInput.type =
+                isPassword
+                    ? "text"
+                    : "password";
+
+            togglePassword.innerHTML =
+                isPassword
+                    ? '<i class="bi bi-eye-slash"></i>'
+                    : '<i class="bi bi-eye"></i>';
         }
+    );
 
-        const profile = snap.data();
 
-        if (profile.role !== "student") {
-            await auth.signOut();
-            throw new Error("This account is not a student account.");
-        }
+    // ========================================================
+    // ERROR MESSAGE
+    // ========================================================
 
-        if (profile.accountStatus === "BLOCKED") {
-            await auth.signOut();
-            throw new Error("Your account is blocked. Contact the administrator.");
-        }
+    function showError(message) {
 
-        window.location.href = "dashboard.html";
-    } catch (error) {
-        console.error(error);
-        message.innerHTML =
-            `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`;
+        loginError.textContent =
+            message;
+
+        loginError.classList.remove(
+            "d-none"
+        );
     }
-});
+
+
+    function hideError() {
+
+        loginError.textContent = "";
+
+        loginError.classList.add(
+            "d-none"
+        );
+    }
+
+
+    // ========================================================
+    // LOGIN
+    // ========================================================
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+            hideError();
+
+            const email =
+                emailInput.value
+                    .trim()
+                    .toLowerCase();
+
+            const password =
+                passwordInput.value;
+
+
+            if (!email || !password) {
+
+                showError(
+                    "Please enter your email and password."
+                );
+
+                return;
+            }
+
+
+            loginButton.disabled =
+                true;
+
+            loginButton.innerHTML =
+                `
+                <span
+                    class="spinner-border spinner-border-sm me-2"
+                ></span>
+                Signing in...
+                `;
+
+
+            try {
+
+                const credential =
+                    await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                // Get Firebase ID token
+
+                const idToken =
+                    await credential.user
+                        .getIdToken(
+                            true
+                        );
+
+
+                // Verify user with our backend
+
+                const response =
+                    await fetch(
+                        "/api/me",
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${idToken}`
+                            }
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.error ||
+                        "Unable to verify your account."
+                    );
+                }
+
+
+                // Make sure this is a student
+
+                if (
+                    data.user.role !==
+                    "STUDENT"
+                ) {
+
+                    await auth.signOut();
+
+                    throw new Error(
+                        "This account is not registered as a student account."
+                    );
+                }
+
+
+                // Store token temporarily
+
+                sessionStorage.setItem(
+                    "entrypass_token",
+                    idToken
+                );
+
+
+                // Store user profile
+
+                sessionStorage.setItem(
+                    "entrypass_user",
+                    JSON.stringify(
+                        data.user
+                    )
+                );
+
+
+                // Redirect
+
+                window.location.href =
+                    "dashboard.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Login error:",
+                    error
+                );
+
+
+                let message =
+                    "Unable to login. Please check your details.";
+
+
+                switch (
+                    error.code
+                ) {
+
+                    case
+                    "auth/invalid-credential":
+
+                        message =
+                            "Incorrect email or password.";
+
+                        break;
+
+
+                    case
+                    "auth/user-disabled":
+
+                        message =
+                            "Your account has been blocked.";
+
+                        break;
+
+
+                    case
+                    "auth/too-many-requests":
+
+                        message =
+                            "Too many login attempts. Please try again later.";
+
+                        break;
+
+
+                    case
+                    "auth/invalid-email":
+
+                        message =
+                            "Please enter a valid email address.";
+
+                        break;
+
+
+                    default:
+
+                        message =
+                            error.message ||
+                            message;
+                }
+
+
+                showError(message);
+
+
+                loginButton.disabled =
+                    false;
+
+                loginButton.innerHTML =
+                    `
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Login
+                    `;
+            }
+
+        }
+    );
+
 </script>
 
 </body>

@@ -1,723 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SRM AP DayPass - Security</title>
+    <title>QR Scanner | SRM AP EntryPass</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f4f6f9;
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at top right, #263b75, transparent 35%),
+                linear-gradient(135deg, #07111f, #101d35);
+            color: white;
         }
 
-        .navbar-brand {
-            font-weight: bold;
+        .navbar {
+            background: rgba(5, 10, 20, .9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,.1);
         }
 
-        .scanner-box {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        .brand {
+            font-weight: 800;
+            letter-spacing: .5px;
         }
 
-        #video {
+        .page {
+            max-width: 1200px;
+            margin: auto;
+            padding: 35px 20px;
+        }
+
+        .hero {
+            margin-bottom: 25px;
+        }
+
+        .hero h1 {
+            font-weight: 800;
+        }
+
+        .hero p {
+            color: #b8c3d9;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 30px;
+            background: rgba(255,255,255,.1);
+            color: #9ec5ff;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .card-box {
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 22px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,.25);
+            backdrop-filter: blur(15px);
+        }
+
+        #reader {
             width: 100%;
-            max-width: 500px;
-            border-radius: 12px;
+            max-width: 550px;
+            margin: auto;
+            border-radius: 18px;
+            overflow: hidden;
             background: #000;
         }
 
-        #canvas {
-            display: none;
-        }
-
-        .result-box {
+        .btn-main {
+            border: 0;
             border-radius: 12px;
-            padding: 20px;
+            padding: 12px 18px;
+            font-weight: 700;
+        }
+
+        .result {
+            display: none;
             margin-top: 20px;
+            padding: 20px;
+            border-radius: 16px;
         }
 
-        .success-box {
-            background: #d1e7dd;
-            color: #0f5132;
+        .result.success {
+            display: block;
+            background: rgba(25, 135, 84, .2);
+            border: 1px solid #198754;
         }
 
-        .error-box {
-            background: #f8d7da;
-            color: #842029;
+        .result.error {
+            display: block;
+            background: rgba(220, 53, 69, .2);
+            border: 1px solid #dc3545;
         }
 
-        .info-box {
-            background: #cff4fc;
-            color: #055160;
+        .info-card {
+            height: 100%;
+            background: rgba(255,255,255,.05);
+            border-radius: 16px;
+            padding: 20px;
         }
 
-        .preview {
-            max-width: 300px;
-            max-height: 300px;
-            border-radius: 10px;
-            margin-top: 15px;
+        .info-card i {
+            font-size: 28px;
+        }
+
+        .small-muted {
+            color: #9caac1;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                SRM AP DayPass
-            </a>
+<nav class="navbar navbar-dark">
+    <div class="container-fluid px-4">
+        <span class="navbar-brand brand">
+            <i class="bi bi-qr-code-scan me-2"></i>
+            SRM AP EntryPass
+        </span>
 
-            <button class="btn btn-outline-light btn-sm" onclick="logout()">
-                Logout
-            </button>
-        </div>
-    </nav>
+        <button class="btn btn-outline-light btn-sm" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </button>
+    </div>
+</nav>
 
-    <div class="container py-4">
+<div class="page">
 
-        <div class="text-center mb-4">
-            <h2>Security Verification</h2>
-            <p class="text-muted">
-                Verify student QR code before allowing entry
-            </p>
-        </div>
+    <div class="hero">
+        <span class="role-badge" id="roleBadge">Checking role...</span>
 
-        <!-- CAMERA SCANNER -->
-        <div class="scanner-box mb-4">
+        <h1 class="mt-3">
+            QR Entry Scanner
+        </h1>
 
-            <h4>📷 Scan QR Using Camera</h4>
+        <p>
+            Scan a student's secure day-pass QR code.
+            Verification is performed by the server.
+        </p>
+    </div>
 
-            <div class="text-center mt-3">
+    <div class="row g-4">
 
-                <video id="video" autoplay playsinline></video>
+        <div class="col-lg-7">
 
-                <canvas id="canvas"></canvas>
+            <div class="card-box">
 
-                <div class="mt-3">
+                <h4 class="mb-3">
+                    <i class="bi bi-camera me-2"></i>
+                    Scan QR Code
+                </h4>
 
-                    <button id="startCameraBtn"
-                            class="btn btn-primary"
-                            onclick="startCamera()">
+                <div id="reader"></div>
+
+                <div class="d-flex flex-wrap gap-2 justify-content-center mt-4">
+
+                    <button
+                        class="btn btn-primary btn-main"
+                        onclick="startCamera()"
+                    >
+                        <i class="bi bi-camera-fill me-2"></i>
                         Start Camera
                     </button>
 
-                    <button id="stopCameraBtn"
-                            class="btn btn-danger"
-                            onclick="stopCamera()"
-                            disabled>
+                    <button
+                        class="btn btn-secondary btn-main"
+                        onclick="stopCamera()"
+                    >
+                        <i class="bi bi-stop-circle me-2"></i>
                         Stop Camera
                     </button>
 
+                    <button
+                        class="btn btn-light btn-main"
+                        onclick="chooseGallery()"
+                    >
+                        <i class="bi bi-image me-2"></i>
+                        Choose QR Image
+                    </button>
+
+                </div>
+
+                <input
+                    type="file"
+                    id="qrFile"
+                    accept="image/*"
+                    hidden
+                >
+
+                <div id="resultBox" class="result"></div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <div class="card-box">
+
+                <h4 class="mb-4">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Verification
+                </h4>
+
+                <div class="info-card mb-3">
+                    <i class="bi bi-fingerprint"></i>
+                    <h5 class="mt-3">Secure QR</h5>
+                    <p class="small-muted mb-0">
+                        QR codes are digitally signed by the server.
+                    </p>
+                </div>
+
+                <div class="info-card mb-3">
+                    <i class="bi bi-clock-history"></i>
+                    <h5 class="mt-3">Time Limited</h5>
+                    <p class="small-muted mb-0">
+                        Expired QR codes are automatically rejected.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <i class="bi bi-shield-lock"></i>
+                    <h5 class="mt-3">Single Use</h5>
+                    <p class="small-muted mb-0">
+                        A successfully used QR cannot be reused.
+                    </p>
                 </div>
 
             </div>
 
         </div>
 
-        <!-- GALLERY -->
-        <div class="scanner-box mb-4">
-
-            <h4>🖼️ Scan From Gallery</h4>
-
-            <p class="text-muted">
-                Upload a screenshot or image containing the student's QR code.
-            </p>
-
-            <input
-                type="file"
-                id="imageInput"
-                class="form-control"
-                accept="image/*"
-                onchange="scanImage(event)"
-            >
-
-            <div class="text-center">
-
-                <img
-                    id="preview"
-                    class="preview"
-                    style="display:none;"
-                >
-
-            </div>
-
-        </div>
-
-        <!-- MANUAL -->
-        <div class="scanner-box mb-4">
-
-            <h4>⌨️ Manual Student ID Verification</h4>
-
-            <p class="text-muted">
-                Enter the student's ID if QR scanning is unavailable.
-            </p>
-
-            <div class="input-group">
-
-                <input
-                    type="text"
-                    id="studentIdInput"
-                    class="form-control"
-                    placeholder="Example: SRMAP-STU-1001"
-                >
-
-                <button
-                    class="btn btn-dark"
-                    onclick="verifyManual()">
-                    Verify
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- RESULT -->
-        <div id="result"></div>
-
     </div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</div>
 
-    <script src="firebase-config.js"></script>
+<script>
 
-    <!-- QR decoder -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+let currentUser = null;
+let scanner = null;
+let scanning = false;
 
-    <script>
+const API = "";
 
-        let video = document.getElementById("video");
-        let canvas = document.getElementById("canvas");
-        let ctx = canvas.getContext("2d");
+function getToken() {
+    return sessionStorage.getItem("entrypass_token");
+}
 
-        let stream = null;
-        let scanning = false;
+async function api(path, options = {}) {
 
-        /*
-         * Wait for Firebase authentication
-         */
-        auth.onAuthStateChanged(async (user) => {
+    const token = getToken();
 
-            if (!user) {
+    const headers = {
+        ...(options.headers || {})
+    };
 
-                window.location.href = "admin-login.html";
-                return;
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
 
-            }
+    if (options.body && !headers["Content-Type"]) {
+        headers["Content-Type"] = "application/json";
+    }
 
-            console.log("Logged in as:", user.email);
+    const response = await fetch(API + path, {
+        ...options,
+        headers
+    });
 
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.error || "Request failed.");
+    }
+
+    return data;
+}
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function checkRole() {
+
+    try {
+
+        if (!getToken()) {
+            window.location.href = "admin-login.html";
+            return;
+        }
+
+        const data = await api("/api/me");
+
+        currentUser = data.user;
+
+        const allowedRoles = [
+            "SECURITY",
+            "ADMIN",
+            "SUPER_ADMIN"
+        ];
+
+        if (!allowedRoles.includes(currentUser.role)) {
+            alert("You are not authorized to use the scanner.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        document.getElementById("roleBadge").textContent =
+            `${currentUser.role} • QR Scanner`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        sessionStorage.clear();
+
+        window.location.href = "admin-login.html";
+    }
+}
+
+async function startCamera() {
+
+    if (scanning) return;
+
+    try {
+
+        scanner = new Html5Qrcode("reader");
+
+        await scanner.start(
+            {
+                facingMode: "environment"
+            },
+            {
+                fps: 10,
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
+            },
+            async (decodedText) => {
+
+                await stopCamera();
+
+                await verifyQR(decodedText);
+            },
+            () => {}
+        );
+
+        scanning = true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        showResult(
+            "error",
+            "Unable to start camera. Please allow camera permission or use Choose QR Image."
+        );
+    }
+}
+
+async function stopCamera() {
+
+    if (!scanner || !scanning) return;
+
+    try {
+
+        await scanner.stop();
+        await scanner.clear();
+
+    } catch (error) {
+
+        console.error(error);
+
+    } finally {
+
+        scanning = false;
+        scanner = null;
+    }
+}
+
+function chooseGallery() {
+
+    document.getElementById("qrFile").click();
+}
+
+document.getElementById("qrFile").addEventListener("change", async function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    try {
+
+        const imageScanner = new Html5Qrcode("reader");
+
+        const decodedText = await imageScanner.scanFile(file, true);
+
+        await imageScanner.clear();
+
+        await verifyQR(decodedText);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showResult(
+            "error",
+            "Could not read a QR code from this image."
+        );
+    }
+
+    this.value = "";
+});
+
+async function verifyQR(qrData) {
+
+    showResult(
+        "success",
+        "Verifying QR code..."
+    );
+
+    try {
+
+        const data = await api("/api/verify-qr", {
+            method: "POST",
+            body: JSON.stringify({
+                qrData
+            })
         });
 
+        const student = data.student || {};
+        const entry = data.entry || {};
 
-        /*
-         * Show result
-         */
-        function showResult(type, title, message, details = "") {
+        showResult(
+            "success",
+            `
+                <h4>
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    ENTRY ALLOWED
+                </h4>
 
-            const result = document.getElementById("result");
+                <hr>
 
-            result.className = "result-box " + type;
+                <p class="mb-1">
+                    <strong>Name:</strong>
+                    ${escapeHtml(student.name)}
+                </p>
 
-            result.innerHTML = `
-                <h4>${title}</h4>
-                <p class="mb-1">${message}</p>
-                ${details}
-            `;
+                <p class="mb-1">
+                    <strong>Student ID:</strong>
+                    ${escapeHtml(student.studentId)}
+                </p>
 
-            result.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
+                <p class="mb-1">
+                    <strong>Student Type:</strong>
+                    ${escapeHtml(student.studentType)}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Today's Entry:</strong>
+                    ${escapeHtml(entry.dailyCount)}
+                    / ${escapeHtml(entry.dailyLimit)}
+                </p>
+            `
+        );
+
+    } catch (error) {
+
+        showResult(
+            "error",
+            `
+                <h4>
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    ENTRY DENIED
+                </h4>
+
+                <p class="mb-0 mt-2">
+                    ${escapeHtml(error.message)}
+                </p>
+            `
+        );
+    }
+}
+
+function showResult(type, html) {
+
+    const box = document.getElementById("resultBox");
+
+    box.className = `result ${type}`;
+    box.innerHTML = html;
+}
+
+async function logout() {
+
+    try {
+        if (getToken()) {
+            await api("/api/logout", {
+                method: "POST"
             });
         }
+    } catch (error) {
+        console.error(error);
+    }
 
+    sessionStorage.clear();
 
-        /*
-         * Get Firebase token
-         */
-        async function getToken() {
+    window.location.href = "admin-login.html";
+}
 
-            const user = auth.currentUser;
+checkRole();
 
-            if (!user) {
-                throw new Error("You are not logged in.");
-            }
-
-            return await user.getIdToken(true);
-        }
-
-
-        /*
-         * VERIFY STUDENT
-         */
-        async function verifyStudent(studentId) {
-
-            if (!studentId) {
-
-                showResult(
-                    "error-box",
-                    "❌ Invalid QR",
-                    "Student ID was not found."
-                );
-
-                return;
-
-            }
-
-            studentId = studentId.trim();
-
-            showResult(
-                "info-box",
-                "⏳ Verifying...",
-                "Please wait while we verify the student."
-            );
-
-            try {
-
-                const token = await getToken();
-
-                console.log("Sending verification request:", studentId);
-
-                const response = await fetch("/api/verify-qr", {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token
-                    },
-
-                    body: JSON.stringify({
-                        studentId: studentId
-                    })
-
-                });
-
-                /*
-                 * Read response safely
-                 */
-                const text = await response.text();
-
-                console.log("Server response:", response.status, text);
-
-                let data = {};
-
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-
-                    data = {
-                        success: false,
-                        message: text || "Invalid server response."
-                    };
-
-                }
-
-
-                /*
-                 * SUCCESS
-                 */
-                if (response.ok && data.success) {
-
-                    const entry = data.entry || {};
-
-                    showResult(
-                        "success-box",
-                        "✅ Entry Successful",
-                        data.message || "Student verified successfully.",
-                        `
-                        <hr>
-                        <strong>Student:</strong>
-                        ${escapeHtml(entry.name || "N/A")}
-                        <br>
-
-                        <strong>Student ID:</strong>
-                        ${escapeHtml(entry.studentId || studentId)}
-                        <br>
-
-                        <strong>Entry:</strong>
-                        ${entry.entryNumber || "N/A"} / ${entry.entryLimit || 3}
-                        <br>
-
-                        <strong>Remaining Entries:</strong>
-                        ${entry.remainingEntries ?? "N/A"}
-                        <br>
-
-                        <strong>Date:</strong>
-                        ${escapeHtml(entry.date || "N/A")}
-                        `
-                    );
-
-                    return;
-                }
-
-
-                /*
-                 * DAILY LIMIT
-                 */
-                if (response.status === 429) {
-
-                    showResult(
-                        "error-box",
-                        "🚫 Daily Limit Reached",
-                        data.message ||
-                        "Maximum 3 entries allowed per day.",
-                        `
-                        <hr>
-                        <strong>Entry Limit:</strong>
-                        ${data.entryLimit ?? 3}
-                        <br>
-                        <strong>Remaining:</strong>
-                        ${data.remainingEntries ?? 0}
-                        `
-                    );
-
-                    return;
-                }
-
-
-                /*
-                 * BLOCKED / OTHER ERROR
-                 */
-                showResult(
-                    "error-box",
-                    "❌ Verification Failed",
-                    data.message || "Student verification failed."
-                );
-
-            } catch (error) {
-
-                console.error("Verification error:", error);
-
-                showResult(
-                    "error-box",
-                    "❌ Unable to Connect",
-                    error.message ||
-                    "Unable to connect to verification server."
-                );
-
-            }
-
-        }
-
-
-        /*
-         * Parse QR data
-         */
-        function processQR(qrText) {
-
-            console.log("QR data:", qrText);
-
-            try {
-
-                const data = JSON.parse(qrText);
-
-                if (data.studentId) {
-
-                    verifyStudent(data.studentId);
-
-                    return;
-
-                }
-
-            } catch (error) {
-
-                console.log("QR is not JSON.");
-
-            }
-
-
-            /*
-             * If QR directly contains Student ID
-             */
-            if (qrText && qrText.trim()) {
-
-                verifyStudent(qrText.trim());
-
-                return;
-
-            }
-
-
-            showResult(
-                "error-box",
-                "❌ Invalid QR",
-                "Could not find a Student ID in this QR code."
-            );
-
-        }
-
-
-        /*
-         * START CAMERA
-         */
-        async function startCamera() {
-
-            if (scanning) return;
-
-            try {
-
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: "environment"
-                    },
-                    audio: false
-                });
-
-                video.srcObject = stream;
-
-                scanning = true;
-
-                document.getElementById("startCameraBtn").disabled = true;
-                document.getElementById("stopCameraBtn").disabled = false;
-
-                requestAnimationFrame(scanCamera);
-
-            } catch (error) {
-
-                console.error(error);
-
-                showResult(
-                    "error-box",
-                    "❌ Camera Error",
-                    "Unable to access camera. Please allow camera permission."
-                );
-
-            }
-
-        }
-
-
-        /*
-         * SCAN CAMERA
-         */
-        function scanCamera() {
-
-            if (!scanning) return;
-
-            if (
-                video.readyState === video.HAVE_ENOUGH_DATA
-            ) {
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                ctx.drawImage(
-                    video,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                const imageData = ctx.getImageData(
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                const code = jsQR(
-                    imageData.data,
-                    imageData.width,
-                    imageData.height
-                );
-
-                if (code) {
-
-                    console.log("QR detected:", code.data);
-
-                    stopCamera();
-
-                    processQR(code.data);
-
-                    return;
-
-                }
-
-            }
-
-            requestAnimationFrame(scanCamera);
-
-        }
-
-
-        /*
-         * STOP CAMERA
-         */
-        function stopCamera() {
-
-            scanning = false;
-
-            if (stream) {
-
-                stream.getTracks().forEach(track => {
-                    track.stop();
-                });
-
-                stream = null;
-
-            }
-
-            video.srcObject = null;
-
-            document.getElementById("startCameraBtn").disabled = false;
-            document.getElementById("stopCameraBtn").disabled = true;
-
-        }
-
-
-        /*
-         * GALLERY IMAGE SCAN
-         */
-        function scanImage(event) {
-
-            const file = event.target.files[0];
-
-            if (!file) return;
-
-            const preview = document.getElementById("preview");
-
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-
-                preview.src = e.target.result;
-                preview.style.display = "block";
-
-                const img = new Image();
-
-                img.onload = function() {
-
-                    const tempCanvas = document.createElement("canvas");
-
-                    const tempCtx = tempCanvas.getContext("2d");
-
-                    tempCanvas.width = img.width;
-                    tempCanvas.height = img.height;
-
-                    tempCtx.drawImage(
-                        img,
-                        0,
-                        0
-                    );
-
-                    const imageData = tempCtx.getImageData(
-                        0,
-                        0,
-                        tempCanvas.width,
-                        tempCanvas.height
-                    );
-
-                    const code = jsQR(
-                        imageData.data,
-                        imageData.width,
-                        imageData.height
-                    );
-
-                    if (code) {
-
-                        console.log("Gallery QR:", code.data);
-
-                        processQR(code.data);
-
-                    } else {
-
-                        showResult(
-                            "error-box",
-                            "❌ QR Not Found",
-                            "No readable QR code was found in this image."
-                        );
-
-                    }
-
-                };
-
-                img.src = e.target.result;
-
-            };
-
-            reader.readAsDataURL(file);
-
-        }
-
-
-        /*
-         * MANUAL VERIFICATION
-         */
-        function verifyManual() {
-
-            const input =
-                document.getElementById("studentIdInput");
-
-            const studentId =
-                input.value.trim();
-
-            if (!studentId) {
-
-                showResult(
-                    "error-box",
-                    "❌ Student ID Required",
-                    "Please enter a Student ID."
-                );
-
-                return;
-
-            }
-
-            verifyStudent(studentId);
-
-        }
-
-
-        /*
-         * Escape HTML
-         */
-        function escapeHtml(value) {
-
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-
-        }
-
-
-        /*
-         * Logout
-         */
-        async function logout() {
-
-            try {
-
-                stopCamera();
-
-                await auth.signOut();
-
-                window.location.href = "index.html";
-
-            } catch (error) {
-
-                console.error(error);
-
-            }
-
-        }
-
-    </script>
+</script>
 
 </body>
-
 </html>

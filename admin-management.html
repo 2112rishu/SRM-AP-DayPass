@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Entry Records | SRM AP EntryPass</title>
+  <title>User Management | SRM AP EntryPass</title>
 
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -22,9 +22,9 @@
   >
 
   <style>
-
     :root {
       --primary: #5b4bff;
+      --primary-dark: #4638d7;
       --purple: #8b5cf6;
       --green: #10b981;
       --red: #ef4444;
@@ -34,7 +34,7 @@
       --muted: #7d8498;
       --bg: #f5f7fb;
       --border: #e7eaf1;
-      --white: #fff;
+      --white: #ffffff;
 
       --sidebar: 250px;
     }
@@ -68,15 +68,10 @@
       background:
         radial-gradient(
           circle at 20% 0%,
-          rgba(112,93,255,.25),
+          rgba(112, 93, 255, .25),
           transparent 30%
         ),
-        linear-gradient(
-          160deg,
-          #12162e,
-          #191d3a,
-          #101426
-        );
+        linear-gradient(160deg, #12162e, #191d3a, #101426);
       color: white;
       z-index: 1000;
     }
@@ -216,9 +211,9 @@
 
     .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      justify-content: space-between;
+      margin-bottom: 25px;
     }
 
     .eyebrow {
@@ -257,11 +252,7 @@
       display: grid;
       place-items: center;
       color: white;
-      background: linear-gradient(
-        135deg,
-        #5b4bff,
-        #9060ed
-      );
+      background: linear-gradient(135deg,#5b4bff,#9060ed);
       font-weight: 800;
       font-size: 12px;
     }
@@ -301,6 +292,17 @@
       box-shadow: 0 18px 38px rgba(70,55,190,.15);
     }
 
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -50px;
+      top: -85px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 50%;
+    }
+
     .hero-content {
       position: relative;
       z-index: 2;
@@ -327,7 +329,7 @@
       margin: 7px 0 0;
       color: rgba(255,255,255,.7);
       font-size: 11px;
-      max-width: 650px;
+      max-width: 600px;
     }
 
     /* STATS */
@@ -356,22 +358,22 @@
       margin-bottom: 11px;
     }
 
-    .purple {
+    .i-purple {
       color: #6254e8;
       background: #efedff;
     }
 
-    .green {
+    .i-green {
       color: #07966b;
       background: #e9faf4;
     }
 
-    .orange {
+    .i-orange {
       color: #d98900;
       background: #fff5df;
     }
 
-    .red {
+    .i-red {
       color: #df4141;
       background: #ffefef;
     }
@@ -387,7 +389,13 @@
       margin-top: 2px;
     }
 
-    /* TABLE PANEL */
+    /* CONTENT */
+
+    .content {
+      display: grid;
+      grid-template-columns: 330px minmax(0,1fr);
+      gap: 17px;
+    }
 
     .panel {
       background: white;
@@ -400,9 +408,6 @@
     .panel-header {
       padding: 17px 18px;
       border-bottom: 1px solid #eff1f5;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     .panel-header h3 {
@@ -417,26 +422,65 @@
       margin: 4px 0 0;
     }
 
-    .refresh-btn {
-      border: 1px solid #e5e8ef;
-      background: white;
-      border-radius: 9px;
-      padding: 7px 10px;
-      color: #5d6474;
+    /* FORM */
+
+    .form-body {
+      padding: 17px;
+    }
+
+    .form-label {
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #4d5569;
+      margin-bottom: 5px;
     }
 
-    .refresh-btn:hover {
-      background: #f7f7ff;
-      color: var(--primary);
+    .form-control,
+    .form-select {
+      border: 1px solid #e5e8ef;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 11px;
+      box-shadow: none !important;
     }
 
-    .toolbar {
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #aaa1ff;
+      box-shadow: 0 0 0 3px rgba(91,75,255,.07) !important;
+    }
+
+    .student-type {
+      display: none;
+    }
+
+    .create-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 11px;
+      padding: 11px;
+      color: white;
+      background: linear-gradient(
+        135deg,
+        #5b4bff,
+        #8156e9
+      );
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .create-btn:hover {
+      filter: brightness(.96);
+    }
+
+    /* USER TABLE */
+
+    .table-toolbar {
       padding: 13px 15px;
       border-bottom: 1px solid #eff1f5;
       display: flex;
-      gap: 9px;
+      gap: 8px;
     }
 
     .search {
@@ -463,22 +507,14 @@
       font-size: 10px;
     }
 
-    .search input:focus {
-      border-color: #aaa1ff;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(91,75,255,.07);
-    }
-
     .filter {
       border: 1px solid #e5e8ef;
       background: white;
       border-radius: 10px;
-      padding: 8px 10px;
+      padding: 8px;
       font-size: 10px;
       outline: none;
     }
-
-    /* TABLE */
 
     .table-wrap {
       overflow-x: auto;
@@ -494,36 +530,32 @@
       color: #9299aa;
       font-size: 8px;
       text-transform: uppercase;
-      letter-spacing: .65px;
-      padding: 12px 15px;
+      letter-spacing: .6px;
+      padding: 11px 14px;
       white-space: nowrap;
     }
 
     td {
       border-top: 1px solid #f0f2f6;
-      padding: 13px 15px;
+      padding: 11px 14px;
       font-size: 10px;
       white-space: nowrap;
-    }
-
-    tbody tr {
-      transition: .15s;
     }
 
     tbody tr:hover {
       background: #fafaff;
     }
 
-    .student {
+    .user-cell {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
     }
 
-    .student-avatar {
-      width: 31px;
-      height: 31px;
-      border-radius: 10px;
+    .user-avatar {
+      width: 29px;
+      height: 29px;
+      border-radius: 9px;
       display: grid;
       place-items: center;
       color: #5d51df;
@@ -532,117 +564,102 @@
       font-weight: 800;
     }
 
-    .student-name {
+    .user-name {
       font-weight: 700;
     }
 
-    .student-id {
+    .user-email {
       color: #9aa1b0;
       font-size: 8px;
       margin-top: 2px;
     }
 
-    .date-box strong {
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-    }
-
-    .date-box span {
-      display: block;
-      color: #9299aa;
-      font-size: 8px;
-      margin-top: 2px;
-    }
-
-    .time-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 7px;
-      background: #f4f5fa;
-      border-radius: 8px;
-      color: #555d70;
-      font-size: 9px;
-      font-weight: 700;
-    }
-
-    .time-box i {
-      color: var(--primary);
-    }
-
-    .badge-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+    .role {
+      display: inline-block;
       border-radius: 20px;
-      padding: 5px 8px;
+      padding: 4px 7px;
+      background: #f1efff;
+      color: #6254e8;
       font-size: 8px;
       font-weight: 800;
     }
 
-    .allowed {
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 20px;
+      padding: 4px 7px;
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .status.active {
       color: #087b59;
       background: #e8faf3;
     }
 
-    .rejected {
+    .status.blocked {
       color: #c73333;
       background: #fff0f0;
     }
 
-    .verified {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .verified-icon {
-      width: 27px;
-      height: 27px;
+    .action-btn {
+      border: 0;
       border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: #eef8ff;
-      color: #1684c7;
-      font-size: 11px;
-    }
-
-    .verified-name {
+      padding: 6px 8px;
+      font-size: 9px;
       font-weight: 700;
-      color: #3c4354;
     }
 
-    .verified-role {
-      color: #9aa1b0;
-      font-size: 8px;
-      margin-top: 2px;
+    .block-btn {
+      color: #c73737;
+      background: #fff0f0;
+    }
+
+    .activate-btn {
+      color: #07815d;
+      background: #e7faf3;
     }
 
     .empty {
       text-align: center;
-      padding: 45px;
+      padding: 40px;
       color: var(--muted);
       font-size: 10px;
     }
 
-    .empty i {
-      display: block;
-      font-size: 30px;
-      color: #c5cad5;
-      margin-bottom: 8px;
+    .message {
+      display: none;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 10px;
+      margin-bottom: 12px;
     }
 
-    /* RESPONSIVE */
+    .message.success {
+      display: block;
+      color: #087b59;
+      background: #e8faf3;
+    }
+
+    .message.error {
+      display: block;
+      color: #c73333;
+      background: #fff0f0;
+    }
 
     @media(max-width:1050px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
       .stats {
         grid-template-columns: repeat(2,1fr);
       }
     }
 
     @media(max-width:750px) {
-
       .sidebar {
         position: relative;
         width: 100%;
@@ -668,18 +685,17 @@
       .profile {
         width: 100%;
       }
-
-      .toolbar {
-        flex-direction: column;
-      }
     }
 
     @media(max-width:500px) {
       .stats {
         grid-template-columns: 1fr;
       }
-    }
 
+      .table-toolbar {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
@@ -690,55 +706,35 @@
   <aside class="sidebar">
 
     <div class="brand">
-
       <div class="brand-icon">
         <i class="bi bi-shield-check"></i>
       </div>
 
       <div>
-        <div class="brand-name">
-          EntryPass
-        </div>
-
-        <div class="brand-sub">
-          SRM AP Campus
-        </div>
+        <div class="brand-name">EntryPass</div>
+        <div class="brand-sub">SRM AP Campus</div>
       </div>
-
     </div>
 
-    <div class="nav-title">
-      Workspace
-    </div>
+    <div class="nav-title">Workspace</div>
 
-    <a
-      href="admin-dashboard.html"
-      class="nav-link-custom"
-    >
+    <a href="admin-dashboard.html" class="nav-link-custom">
       <i class="bi bi-grid-1x2-fill"></i>
       Dashboard
     </a>
 
-    <a
-      href="admin-management.html"
-      class="nav-link-custom"
-    >
+    <a href="admin-management.html"
+       class="nav-link-custom active">
       <i class="bi bi-people-fill"></i>
       User Management
     </a>
 
-    <a
-      href="admin.html"
-      class="nav-link-custom active"
-    >
+    <a href="admin.html" class="nav-link-custom">
       <i class="bi bi-ticket-perforated-fill"></i>
       Entry Records
     </a>
 
-    <a
-      href="index.html"
-      class="nav-link-custom"
-    >
+    <a href="index.html" class="nav-link-custom">
       <i class="bi bi-house-door-fill"></i>
       Home
     </a>
@@ -748,16 +744,12 @@
       <div class="online-box">
         <span class="online-dot"></span>
         <strong>System Online</strong>
-
         <small>
           EntryPass services are operating normally.
         </small>
       </div>
 
-      <button
-        class="logout"
-        id="logoutBtn"
-      >
+      <button class="logout" id="logoutBtn">
         <i class="bi bi-box-arrow-right me-2"></i>
         Sign Out
       </button>
@@ -774,46 +766,33 @@
     <div class="topbar">
 
       <div>
-
         <div class="eyebrow">
           EntryPass / Administration
         </div>
 
         <h1 class="page-title">
-          Entry Records
+          User Management
         </h1>
 
         <div class="page-subtitle">
-          Monitor and review campus access verification activity.
+          Create and manage student and staff accounts.
         </div>
-
       </div>
 
       <div class="profile">
 
-        <div
-          class="avatar"
-          id="adminAvatar"
-        >
+        <div class="avatar" id="adminAvatar">
           A
         </div>
 
         <div>
-
-          <div
-            class="profile-name"
-            id="adminName"
-          >
+          <div class="profile-name" id="adminName">
             Administrator
           </div>
 
-          <div
-            class="profile-role"
-            id="adminRole"
-          >
+          <div class="profile-role" id="adminRole">
             ADMIN
           </div>
-
         </div>
 
       </div>
@@ -828,18 +807,17 @@
       <div class="hero-content">
 
         <div class="hero-label">
-          <i class="bi bi-activity me-1"></i>
-          CAMPUS ACCESS MONITOR
+          <i class="bi bi-person-gear me-1"></i>
+          ACCOUNT CONTROL
         </div>
 
         <h2>
-          Entry activity at a glance.
+          Manage your campus users.
         </h2>
 
         <p>
-          Review verified student entries, monitor access
-          decisions and see exactly when and by whom each
-          entry was processed.
+          Create accounts, assign roles, search users and
+          control account access from one secure workspace.
         </p>
 
       </div>
@@ -852,191 +830,276 @@
     <section class="stats">
 
       <div class="stat">
-
-        <div class="stat-icon purple">
-          <i class="bi bi-ticket-detailed-fill"></i>
+        <div class="stat-icon i-purple">
+          <i class="bi bi-people-fill"></i>
         </div>
 
-        <div
-          class="stat-number"
-          id="totalEntries"
-        >
+        <div class="stat-number" id="totalUsers">
           0
         </div>
 
         <div class="stat-label">
-          Total entries
+          Total users
         </div>
-
       </div>
 
-
       <div class="stat">
-
-        <div class="stat-icon green">
-          <i class="bi bi-check-circle-fill"></i>
+        <div class="stat-icon i-green">
+          <i class="bi bi-person-check-fill"></i>
         </div>
 
-        <div
-          class="stat-number"
-          id="allowedEntries"
-        >
+        <div class="stat-number" id="activeUsers">
           0
         </div>
 
         <div class="stat-label">
-          Allowed entries
+          Active accounts
         </div>
-
       </div>
 
-
       <div class="stat">
-
-        <div class="stat-icon red">
-          <i class="bi bi-x-circle-fill"></i>
+        <div class="stat-icon i-orange">
+          <i class="bi bi-mortarboard-fill"></i>
         </div>
 
-        <div
-          class="stat-number"
-          id="rejectedEntries"
-        >
+        <div class="stat-number" id="studentUsers">
           0
         </div>
 
         <div class="stat-label">
-          Rejected entries
+          Students
         </div>
-
       </div>
 
-
       <div class="stat">
-
-        <div class="stat-icon orange">
-          <i class="bi bi-calendar-check-fill"></i>
+        <div class="stat-icon i-red">
+          <i class="bi bi-person-x-fill"></i>
         </div>
 
-        <div
-          class="stat-number"
-          id="todayEntries"
-        >
+        <div class="stat-number" id="blockedUsers">
           0
         </div>
 
         <div class="stat-label">
-          Today's entries
+          Blocked accounts
         </div>
-
       </div>
 
     </section>
 
 
-    <!-- RECORDS -->
+    <!-- CONTENT -->
 
-    <section class="panel">
+    <section class="content">
 
-      <div class="panel-header">
+      <!-- CREATE USER -->
 
-        <div>
+      <div class="panel">
 
+        <div class="panel-header">
           <h3>
-            <i class="bi bi-list-check me-1"></i>
-            Campus Entry Records
+            <i class="bi bi-person-plus-fill me-1"></i>
+            Create User
           </h3>
 
           <p>
-            Date, time and verification details for every record
+            Add a new campus account
+          </p>
+        </div>
+
+        <div class="form-body">
+
+          <div id="message" class="message"></div>
+
+          <form id="createUserForm">
+
+            <div class="mb-3">
+              <label class="form-label">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                id="name"
+                class="form-control"
+                placeholder="Enter full name"
+                required
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                placeholder="example@srmist.edu.in"
+                required
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                Temporary Password
+              </label>
+
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="Minimum 6 characters"
+                minlength="6"
+                required
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                Role
+              </label>
+
+              <select
+                id="role"
+                class="form-select"
+                required
+              >
+                <option value="STUDENT">
+                  Student
+                </option>
+
+                <option value="SECURITY">
+                  Security
+                </option>
+
+                <option value="ADMIN">
+                  Admin
+                </option>
+
+                <option value="SUPER_ADMIN">
+                  Super Admin
+                </option>
+              </select>
+            </div>
+
+            <div
+              class="student-type mb-3"
+              id="studentTypeWrapper"
+            >
+
+              <label class="form-label">
+                Student Type
+              </label>
+
+              <select
+                id="studentType"
+                class="form-select"
+              >
+                <option value="DAY_SCHOLAR">
+                  Day Scholar
+                </option>
+
+                <option value="HOSTELLER">
+                  Hosteller
+                </option>
+              </select>
+
+            </div>
+
+            <button
+              type="submit"
+              class="create-btn"
+              id="createBtn"
+            >
+              <i class="bi bi-plus-circle me-1"></i>
+              Create Account
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+
+      <!-- USERS -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <h3>
+            <i class="bi bi-people-fill me-1"></i>
+            Campus Users
+          </h3>
+
+          <p>
+            Search and manage registered accounts
           </p>
 
         </div>
 
-        <button
-          class="refresh-btn"
-          id="refreshBtn"
-        >
-          <i class="bi bi-arrow-clockwise me-1"></i>
-          Refresh
-        </button>
+        <div class="table-toolbar">
 
-      </div>
+          <div class="search">
 
+            <i class="bi bi-search"></i>
 
-      <div class="toolbar">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name, email, ID, role..."
+            >
 
-        <div class="search">
+          </div>
 
-          <i class="bi bi-search"></i>
+          <select id="roleFilter" class="filter">
 
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search student, ID, status or verified by..."
-          >
+            <option value="ALL">
+              All Roles
+            </option>
+
+            <option value="STUDENT">
+              Student
+            </option>
+
+            <option value="SECURITY">
+              Security
+            </option>
+
+            <option value="ADMIN">
+              Admin
+            </option>
+
+            <option value="SUPER_ADMIN">
+              Super Admin
+            </option>
+
+          </select>
 
         </div>
 
+        <div class="table-wrap">
 
-        <select
-          id="statusFilter"
-          class="filter"
-        >
+          <table>
 
-          <option value="ALL">
-            All Status
-          </option>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>ID</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-          <option value="ALLOWED">
-            Allowed
-          </option>
+            <tbody id="usersTableBody"></tbody>
 
-          <option value="REJECTED">
-            Rejected
-          </option>
+          </table>
 
-        </select>
-
-      </div>
-
-
-      <div class="table-wrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Student
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Time
-              </th>
-
-              <th>
-                Verified By
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="entriesTableBody"
-          ></tbody>
-
-        </table>
+        </div>
 
       </div>
 
@@ -1048,16 +1111,12 @@
   <script>
 
     const token =
-      sessionStorage.getItem(
-        "entrypass_token"
-      );
+      sessionStorage.getItem("entrypass_token");
 
     let currentUser = null;
-    let allEntries = [];
-
+    let allUsers = [];
 
     function escapeHtml(value) {
-
       return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -1066,9 +1125,7 @@
         .replace(/'/g, "&#039;");
     }
 
-
     function initials(name) {
-
       return String(name || "U")
         .trim()
         .split(/\s+/)
@@ -1078,97 +1135,7 @@
         .toUpperCase();
     }
 
-
-    function getDateObject(value) {
-
-      if (!value) return null;
-
-      if (
-        typeof value === "object" &&
-        value.seconds
-      ) {
-        return new Date(
-          Number(value.seconds) * 1000
-        );
-      }
-
-      if (
-        typeof value === "object" &&
-        value._seconds
-      ) {
-        return new Date(
-          Number(value._seconds) * 1000
-        );
-      }
-
-      const date =
-        new Date(value);
-
-      return Number.isNaN(
-        date.getTime()
-      )
-        ? null
-        : date;
-    }
-
-
-    function formatDate(value) {
-
-      const date =
-        getDateObject(value);
-
-      if (!date) return "-";
-
-      return date.toLocaleDateString(
-        "en-IN",
-        {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        }
-      );
-    }
-
-
-    function formatTime(value) {
-
-      const date =
-        getDateObject(value);
-
-      if (!date) return "-";
-
-      return date.toLocaleTimeString(
-        "en-IN",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true
-        }
-      );
-    }
-
-
-    function timestamp(entry) {
-
-      const value =
-        entry.createdAt ||
-        entry.timestamp ||
-        entry.date;
-
-      const date =
-        getDateObject(value);
-
-      return date
-        ? date.getTime()
-        : 0;
-    }
-
-
-    async function api(
-      url,
-      options = {}
-    ) {
+    async function api(url, options = {}) {
 
       const headers = {
         ...(options.headers || {})
@@ -1185,19 +1152,15 @@
       }
 
       const response =
-        await fetch(
-          url,
-          {
-            ...options,
-            headers
-          }
-        );
+        await fetch(url, {
+          ...options,
+          headers
+        });
 
       let data = {};
 
       try {
-        data =
-          await response.json();
+        data = await response.json();
       } catch {}
 
       if (!response.ok) {
@@ -1215,8 +1178,7 @@
     async function loadProfile() {
 
       if (!token) {
-        location.href =
-          "admin-login.html";
+        location.href = "admin-login.html";
         return false;
       }
 
@@ -1229,22 +1191,16 @@
           data.user || data;
 
         const role =
-          String(
-            currentUser.role || ""
-          ).toUpperCase();
+          String(currentUser.role || "")
+            .toUpperCase();
 
         if (
           role !== "ADMIN" &&
           role !== "SUPER_ADMIN"
         ) {
-
-          alert(
-            "Access denied."
-          );
-
+          alert("Access denied.");
           location.href =
             "admin-login.html";
-
           return false;
         }
 
@@ -1263,15 +1219,13 @@
 
         document.getElementById(
           "adminAvatar"
-        ).textContent =
-          initials(name);
+        ).textContent = initials(name);
 
         return true;
 
       } catch (error) {
 
         sessionStorage.clear();
-
         location.href =
           "admin-login.html";
 
@@ -1280,94 +1234,64 @@
     }
 
 
-    async function loadEntries() {
+    async function loadUsers() {
 
       const data =
-        await api(
-          "/api/admin/entries"
-        );
+        await api("/api/admin/users");
 
-      allEntries =
-        Array.isArray(data.entries)
-          ? data.entries
+      allUsers =
+        Array.isArray(data.users)
+          ? data.users
           : [];
 
       updateStats();
-      renderEntries();
+      renderUsers();
     }
 
 
     function updateStats() {
 
-      const total =
-        allEntries.length;
-
-      const allowed =
-        allEntries.filter(entry =>
+      const active =
+        allUsers.filter(user =>
           String(
-            entry.status || ""
-          ).toUpperCase() ===
-          "ALLOWED"
+            user.accountStatus ||
+            user.status ||
+            "ACTIVE"
+          ).toUpperCase() === "ACTIVE"
         ).length;
 
-      const rejected =
-        allEntries.filter(entry =>
-          String(
-            entry.status || ""
-          ).toUpperCase() ===
-          "REJECTED"
+      const students =
+        allUsers.filter(user =>
+          String(user.role || "")
+            .toUpperCase() === "STUDENT"
         ).length;
 
-      const today =
-        new Date()
-          .toLocaleDateString(
-            "en-CA"
-          );
-
-      const todayCount =
-        allEntries.filter(entry => {
-
-          const value =
-            entry.createdAt ||
-            entry.timestamp ||
-            entry.date;
-
-          const date =
-            getDateObject(value);
-
-          if (!date) return false;
-
-          return date
-            .toLocaleDateString(
-              "en-CA"
-            ) === today;
-
-        }).length;
-
+      const blocked =
+        allUsers.length - active;
 
       document.getElementById(
-        "totalEntries"
-      ).textContent = total;
+        "totalUsers"
+      ).textContent = allUsers.length;
 
       document.getElementById(
-        "allowedEntries"
-      ).textContent = allowed;
+        "activeUsers"
+      ).textContent = active;
 
       document.getElementById(
-        "rejectedEntries"
-      ).textContent = rejected;
+        "studentUsers"
+      ).textContent = students;
 
       document.getElementById(
-        "todayEntries"
-      ).textContent = todayCount;
+        "blockedUsers"
+      ).textContent = blocked;
     }
 
 
-    function renderEntries() {
+    function renderUsers() {
 
       const tbody =
         document.getElementById(
-          "entriesTableBody"
+          "usersTableBody"
         );
 
       const query =
@@ -1377,53 +1301,41 @@
           .trim()
           .toLowerCase();
 
-      const statusFilter =
+      const roleFilter =
         document.getElementById(
-          "statusFilter"
+          "roleFilter"
         ).value;
 
-
       const filtered =
-        allEntries
-          .filter(entry => {
+        allUsers.filter(user => {
 
-            const status =
-              String(
-                entry.status || ""
-              ).toUpperCase();
+          const role =
+            String(user.role || "")
+              .toUpperCase();
 
-            if (
-              statusFilter !== "ALL" &&
-              status !== statusFilter
-            ) {
-              return false;
-            }
+          if (
+            roleFilter !== "ALL" &&
+            role !== roleFilter
+          ) {
+            return false;
+          }
 
-            const searchable = [
-              entry.studentName,
-              entry.name,
-              entry.studentId,
-              entry.id,
-              entry.status,
-              entry.verifiedBy,
-              entry.verifiedByName,
-              entry.verifiedByRole,
-              entry.dayKey
-            ]
-              .filter(Boolean)
-              .join(" ")
-              .toLowerCase();
+          const searchable = [
+            user.name,
+            user.email,
+            user.studentId,
+            user.id,
+            user.uid,
+            user.role,
+            user.accountStatus,
+            user.status
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
 
-            return searchable
-              .includes(query);
-
-          })
-          .sort(
-            (a,b) =>
-              timestamp(b) -
-              timestamp(a)
-          );
-
+          return searchable.includes(query);
+        });
 
       if (!filtered.length) {
 
@@ -1431,8 +1343,8 @@
           <tr>
             <td colspan="5">
               <div class="empty">
-                <i class="bi bi-inbox"></i>
-                No entry records found.
+                <i class="bi bi-search d-block fs-4 mb-2"></i>
+                No users found.
               </div>
             </td>
           </tr>
@@ -1441,100 +1353,81 @@
         return;
       }
 
-
       tbody.innerHTML =
-        filtered.map(entry => {
+        filtered.map(user => {
 
           const name =
-            entry.studentName ||
-            entry.name ||
-            "Unknown Student";
+            user.name ||
+            user.email ||
+            "Unknown User";
 
-          const studentId =
-            entry.studentId ||
-            entry.id ||
+          const email =
+            user.email || "-";
+
+          const id =
+            user.studentId ||
+            user.id ||
             "-";
+
+          const role =
+            String(user.role || "STUDENT")
+              .toUpperCase();
 
           const status =
             String(
-              entry.status ||
-              "UNKNOWN"
+              user.accountStatus ||
+              user.status ||
+              "ACTIVE"
             ).toUpperCase();
 
-          const allowed =
-            status === "ALLOWED";
-
-
-          /*
-             Use verifiedByName when the
-             backend provides it.
-
-             Otherwise show the actual
-             stored verifiedBy value.
-          */
-
-          const verifiedBy =
-            entry.verifiedByName ||
-            entry.verifiedBy ||
-            "Unknown";
-
-
-          const verifiedRole =
-            entry.verifiedByRole ||
-            "Staff";
-
-
-          const dateValue =
-            entry.createdAt ||
-            entry.timestamp ||
-            entry.date;
-
+          const isActive =
+            status === "ACTIVE";
 
           return `
-
             <tr>
 
-              <!-- STUDENT -->
-
               <td>
+                <div class="user-cell">
 
-                <div class="student">
-
-                  <div class="student-avatar">
+                  <div class="user-avatar">
                     ${escapeHtml(
                       initials(name)
                     )}
                   </div>
 
                   <div>
-
-                    <div class="student-name">
+                    <div class="user-name">
                       ${escapeHtml(name)}
                     </div>
 
-                    <div class="student-id">
-                      ${escapeHtml(studentId)}
+                    <div class="user-email">
+                      ${escapeHtml(email)}
                     </div>
-
                   </div>
 
                 </div>
-
               </td>
 
+              <td>
+                ${escapeHtml(id)}
+              </td>
 
-              <!-- STATUS -->
+              <td>
+                <span class="role">
+                  ${escapeHtml(role)}
+                </span>
+              </td>
 
               <td>
 
-                <span class="badge-status ${
-                  allowed
-                    ? "allowed"
-                    : "rejected"
+                <span class="status ${
+                  isActive
+                    ? "active"
+                    : "blocked"
                 }">
 
                   <i class="bi ${
-                    allowed
+                    isActive
                       ? "bi-check-circle-fill"
                       : "bi-x-circle-fill"
                   }"></i>
@@ -1545,131 +1438,235 @@
 
               </td>
 
-
-              <!-- DATE -->
-
               <td>
 
-                <div class="date-box">
+                <button
+                  class="action-btn ${
+                    isActive
+                      ? "block-btn"
+                      : "activate-btn"
+                  }"
+                  onclick="changeStatus(
+                    '${escapeHtml(user.uid)}',
+                    '${isActive ? "BLOCKED" : "ACTIVE"}'
+                  )"
+                >
 
-                  <strong>
-                    ${escapeHtml(
-                      formatDate(dateValue)
-                    )}
-                  </strong>
+                  <i class="bi ${
+                    isActive
+                      ? "bi-person-x"
+                      : "bi-person-check"
+                  }"></i>
 
-                  <span>
-                    Entry date
-                  </span>
+                  ${
+                    isActive
+                      ? "Block"
+                      : "Activate"
+                  }
 
-                </div>
-
-              </td>
-
-
-              <!-- TIME -->
-
-              <td>
-
-                <span class="time-box">
-
-                  <i class="bi bi-clock"></i>
-
-                  ${escapeHtml(
-                    formatTime(dateValue)
-                  )}
-
-                </span>
-
-              </td>
-
-
-              <!-- VERIFIED BY -->
-
-              <td>
-
-                <div class="verified">
-
-                  <div class="verified-icon">
-                    <i class="bi bi-shield-check"></i>
-                  </div>
-
-                  <div>
-
-                    <div class="verified-name">
-                      ${escapeHtml(
-                        verifiedBy
-                      )}
-                    </div>
-
-                    <div class="verified-role">
-                      ${escapeHtml(
-                        verifiedRole
-                      )}
-                    </div>
-
-                  </div>
-
-                </div>
+                </button>
 
               </td>
 
             </tr>
-
           `;
 
         }).join("");
     }
 
 
-    document
-      .getElementById("searchInput")
-      .addEventListener(
-        "input",
-        renderEntries
-      );
+    async function changeStatus(uid, status) {
+
+      if (!uid) return;
+
+      const action =
+        status === "ACTIVE"
+          ? "activate"
+          : "block";
+
+      if (
+        !confirm(
+          `Are you sure you want to ${action} this account?`
+        )
+      ) {
+        return;
+      }
+
+      try {
+
+        await api(
+          `/api/users/${encodeURIComponent(uid)}/status`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              status
+            })
+          }
+        );
+
+        await loadUsers();
+
+        showMessage(
+          `Account ${action}d successfully.`,
+          "success"
+        );
+
+      } catch (error) {
+
+        showMessage(
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    function showMessage(text, type) {
+
+      const box =
+        document.getElementById("message");
+
+      box.textContent = text;
+      box.className =
+        "message " + type;
+
+      setTimeout(() => {
+        box.className = "message";
+      }, 4000);
+    }
 
 
     document
-      .getElementById("statusFilter")
+      .getElementById("role")
       .addEventListener(
         "change",
-        renderEntries
+        function () {
+
+          const wrapper =
+            document.getElementById(
+              "studentTypeWrapper"
+            );
+
+          if (this.value === "STUDENT") {
+            wrapper.style.display = "block";
+          } else {
+            wrapper.style.display = "none";
+          }
+        }
       );
 
 
     document
-      .getElementById("refreshBtn")
+      .getElementById("createUserForm")
       .addEventListener(
-        "click",
-        async function() {
+        "submit",
+        async function(event) {
 
-          const original =
-            this.innerHTML;
+          event.preventDefault();
 
-          this.disabled = true;
+          const button =
+            document.getElementById(
+              "createBtn"
+            );
 
-          this.innerHTML =
+          const name =
+            document.getElementById(
+              "name"
+            ).value.trim();
+
+          const email =
+            document.getElementById(
+              "email"
+            ).value.trim();
+
+          const password =
+            document.getElementById(
+              "password"
+            ).value;
+
+          const role =
+            document.getElementById(
+              "role"
+            ).value;
+
+          const studentType =
+            document.getElementById(
+              "studentType"
+            ).value;
+
+          button.disabled = true;
+          button.innerHTML =
             `<span class="spinner-border spinner-border-sm me-1"></span>
-             Loading...`;
+             Creating...`;
 
           try {
 
-            await loadEntries();
+            const body = {
+              name,
+              email,
+              password,
+              role
+            };
 
-          } catch(error) {
+            if (role === "STUDENT") {
+              body.studentType =
+                studentType;
+            }
 
-            alert(
-              error.message
+            const result =
+              await api(
+                "/api/super-admin/create-user",
+                {
+                  method: "POST",
+                  body: JSON.stringify(body)
+                }
+              );
+
+            showMessage(
+              result.message ||
+              "User created successfully.",
+              "success"
+            );
+
+            this.reset();
+
+            document.getElementById(
+              "studentTypeWrapper"
+            ).style.display = "block";
+
+            await loadUsers();
+
+          } catch (error) {
+
+            showMessage(
+              error.message,
+              "error"
             );
 
           } finally {
 
-            this.disabled = false;
-            this.innerHTML =
-              original;
+            button.disabled = false;
+
+            button.innerHTML =
+              `<i class="bi bi-plus-circle me-1"></i>
+               Create Account`;
           }
         }
+      );
+
+
+    document
+      .getElementById("searchInput")
+      .addEventListener(
+        "input",
+        renderUsers
+      );
+
+    document
+      .getElementById("roleFilter")
+      .addEventListener(
+        "change",
+        renderUsers
       );
 
 
@@ -1680,14 +1677,10 @@
         async () => {
 
           try {
-
             await api(
               "/api/logout",
-              {
-                method: "POST"
-              }
+              { method: "POST" }
             );
-
           } catch {}
 
           sessionStorage.clear();
@@ -1706,28 +1699,15 @@
       if (!allowed) return;
 
       try {
+        await loadUsers();
+      } catch (error) {
 
-        await loadEntries();
-
-      } catch(error) {
-
-        console.error(error);
-
-        document.getElementById(
-          "entriesTableBody"
-        ).innerHTML = `
-          <tr>
-            <td colspan="5">
-              <div class="empty">
-                <i class="bi bi-cloud-slash"></i>
-                Unable to load entry records.
-              </div>
-            </td>
-          </tr>
-        `;
+        showMessage(
+          error.message,
+          "error"
+        );
       }
     }
-
 
     init();
 

@@ -1,6 +1,4 @@
-// ============================================================
-// SRM AP DAYPASS - FIREBASE WEB CONFIG
-// ============================================================
+"use strict";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCu8XDAIBqIVp_49ta4383TP4xdP-n2sbw",
@@ -13,11 +11,6 @@ const firebaseConfig = {
     measurementId: "G-WDYKW0TBFE"
 };
 
-
-// ============================================================
-// INITIALIZE FIREBASE
-// ============================================================
-
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -25,63 +18,22 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-
-// ============================================================
-// CHECK FIREBASE CONFIG
-// ============================================================
-
-function showConfigWarning() {
-
-    const bad =
-        !firebaseConfig.apiKey ||
-        firebaseConfig.apiKey.includes("PASTE_") ||
-        !firebaseConfig.messagingSenderId ||
-        firebaseConfig.messagingSenderId.includes("PASTE_") ||
-        !firebaseConfig.appId ||
-        firebaseConfig.appId.includes("PASTE_");
-
-    if (bad) {
-        console.warn(
-            "Firebase Web config is still using placeholders. " +
-            "Replace the values in firebase-config.js."
-        );
-    }
-}
-
-showConfigWarning();
-
-
-// ============================================================
-// GET FIREBASE ID TOKEN
-// ============================================================
-
 async function getIdToken() {
-
     const user = auth.currentUser;
 
     if (!user) {
-        throw new Error("Please login first.");
+        throw new Error("Authentication required.");
     }
 
     return await user.getIdToken(true);
 }
 
-
-// ============================================================
-// API REQUEST HELPER
-// ============================================================
-
 async function apiRequest(url, options = {}) {
-
     const token = await getIdToken();
 
     const headers = {
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
-
-        ...(options.body
-            ? { "Content-Type": "application/json" }
-            : {}),
-
         ...(options.headers || {})
     };
 
@@ -90,65 +42,33 @@ async function apiRequest(url, options = {}) {
         headers
     });
 
-    const text = await response.text();
-
-    let data = {};
-
-    if (text.trim()) {
-
-        try {
-            data = JSON.parse(text);
-        }
-
-        catch {
-            throw new Error(
-                "Server returned invalid JSON."
-            );
-        }
-    }
+    const data = await response.json().catch(() => ({
+        error: "Invalid server response."
+    }));
 
     if (!response.ok) {
-
-        throw new Error(
-            data.message ||
-            data.error ||
-            `Server error: ${response.status}`
-        );
+        throw new Error(data.error || "Request failed.");
     }
 
     return data;
 }
 
-
-// ============================================================
-// HTML ESCAPE HELPER
-// ============================================================
-
 function escapeHtml(value) {
-
     return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-
-// ============================================================
-// DATE/TIME FORMATTER
-// ============================================================
-
 function formatDateTime(value) {
-
-    if (!value) {
-        return "-";
-    }
+    if (!value) return "-";
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-        return String(value);
+        return "-";
     }
 
     return date.toLocaleString("en-IN", {
@@ -157,137 +77,49 @@ function formatDateTime(value) {
     });
 }
 
-
-// ============================================================
-// REQUIRE LOGIN
-// ============================================================
-
-async function requireLoggedIn() {
-
-    return new Promise((resolve, reject) => {
-
-        const unsubscribe =
-            auth.onAuthStateChanged(user => {
-
-                unsubscribe();
-
-                if (user) {
-
-                    resolve(user);
-
-                } else {
-
-                    window.location.href =
-                        "index.html";
-
-                    reject(
-                        new Error("Not logged in.")
-                    );
-                }
-            });
-    });
-}
-
-
-// ============================================================
-// GET CURRENT USER PROFILE
-// ============================================================
-
 async function getMyProfile() {
-
     return await apiRequest("/api/me");
 }
 
+function requireLoggedIn() {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            unsubscribe();
 
-// ============================================================
-// REQUIRE SPECIFIC ROLE
-// ============================================================
-
-async function requireRole(role) {
-
-    await requireLoggedIn();
-
-    try {
-
-        const data = await getMyProfile();
-
-        const profile =
-            data.profile || data.user;
-
-        if (!profile) {
-
-            throw new Error(
-                "User profile not found."
-            );
-        }
-
-        if (profile.role !== role) {
-
-            window.location.href =
-                role === "admin"
-                    ? "dashboard.html"
-                    : "admin.html";
-
-            throw new Error(
-                "Access denied."
-            );
-        }
-
-        if (
-            profile.accountStatus ===
-            "BLOCKED"
-        ) {
-
-            await auth.signOut();
-
-            window.location.href =
-                "student-login.html";
-
-            throw new Error(
-                "Account blocked."
-            );
-        }
-
-        return data;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Role verification error:",
-            error
-        );
-
-        throw error;
-    }
+            if (user) {
+                resolve(user);
+            } else {
+                window.location.replace("index.html");
+                reject(new Error("Login required."));
+            }
+        });
+    });
 }
 
+async function requireRole(...allowedRoles) {
+    await requireLoggedIn();
 
-// ============================================================
-// LOGOUT
-// ============================================================
+    const profile = await getMyProfile();
 
-async function logout() {
+    const role =
+        profile &&
+        profile.user &&
+        profile.user.role;
 
-    try {
-
+    if (!allowedRoles.includes(role)) {
         await auth.signOut();
 
-        window.location.href =
-            "index.html";
+        alert("You are not authorized to access this page.");
 
+        window.location.replace("index.html");
+
+        throw new Error("Unauthorized role.");
     }
 
-    catch (error) {
+    return profile;
+}
 
-        console.error(
-            "Logout error:",
-            error
-        );
-
-        alert(
-            "Unable to logout. Please try again."
-        );
-    }
+async function logout() {
+    await auth.signOut();
+    window.location.replace("index.html");
 }

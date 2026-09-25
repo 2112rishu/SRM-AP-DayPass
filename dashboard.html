@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Student Dashboard - SRM AP DayPass</title>
+    <title>Student Dashboard | SRM AP DayPass</title>
 
     <!-- Bootstrap -->
     <link
@@ -13,127 +12,814 @@
         rel="stylesheet"
     >
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-    <script src="firebase-config.js"></script>
-
-    <!-- QR Code Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --purple: #7c3aed;
+            --dark: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --background: #f5f7fb;
+            --white: #ffffff;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
-            background: #f4f6f9;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            color: var(--dark);
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(37, 99, 235, 0.08),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 20%,
+                    rgba(124, 58, 237, 0.07),
+                    transparent 30%
+                ),
+                var(--background);
+            min-height: 100vh;
         }
 
-        .navbar {
-            background: #14213d;
+        button {
+            font-family: inherit;
         }
 
-        .navbar-brand {
-            font-weight: bold;
+        /* ================= NAVBAR ================= */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 35px rgba(15,23,42,0.15);
         }
 
-        .welcome-card {
-            background: linear-gradient(135deg, #14213d, #1d3557);
+        .topbar-inner {
+            min-height: 76px;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(
+                135deg,
+                #3b82f6,
+                #7c3aed
+            );
             color: white;
-            border-radius: 15px;
+            font-size: 21px;
+            box-shadow:
+                0 8px 22px rgba(37,99,235,.35);
+        }
+
+        .brand {
+            color: white;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .brand-subtitle {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255,255,255,.18);
+            color: #e2e8f0;
+            background: rgba(255,255,255,.07);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .2s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        /* ================= MAIN ================= */
+
+        .main-container {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 42px 0 60px;
+        }
+
+        .welcome-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .welcome-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 11px;
+        }
+
+        .welcome h1 {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: clamp(27px, 4vw, 38px);
+            line-height: 1.15;
+            font-weight: 800;
+            margin: 0 0 9px;
+            letter-spacing: -1px;
+        }
+
+        .welcome p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .security-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.8);
+            border: 1px solid var(--border);
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .security-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+        }
+
+        /* ================= COMMON CARD ================= */
+
+        .card-modern {
+            position: relative;
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226,232,240,.9);
+            border-radius: 24px;
+            box-shadow:
+                0 15px 45px rgba(15,23,42,.055),
+                0 2px 8px rgba(15,23,42,.03);
             padding: 25px;
+            margin-bottom: 22px;
+            overflow: hidden;
         }
 
-        .stat-card {
-            border: none;
+        .card-modern::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,.4),
+                transparent 45%
+            );
+        }
+
+        .card-title {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        /* ================= PROFILE ================= */
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 21px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 27px;
+            font-weight: 800;
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #7c3aed
+                );
+            box-shadow:
+                0 12px 28px rgba(37,99,235,.25);
+        }
+
+        .student-name {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .student-id {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 13px;
+            margin-top: 22px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e8edf4;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            text-align: center;
-            padding: 20px;
-            height: 100%;
+            padding: 15px;
+            transition: .2s ease;
         }
 
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
+        .info-box:hover {
+            border-color: #bfdbfe;
+            background: #f8fbff;
+            transform: translateY(-1px);
         }
+
+        .info-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 7px;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .active-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* ================= QR ================= */
 
         .qr-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            padding: 34px 25px 30px;
+            background:
+                radial-gradient(
+                    circle at 50% -20%,
+                    rgba(59,130,246,.12),
+                    transparent 42%
+                ),
+                rgba(255,255,255,.92);
+        }
+
+        .qr-header {
+            position: relative;
+            z-index: 2;
+        }
+
+        .qr-icon {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 13px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 24px;
+            border: 1px solid #dbeafe;
+        }
+
+        .qr-card h2 {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .qr-description {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            display: inline-flex;
+            margin: 25px auto 15px;
+        }
+
+        #qrBox {
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #dbe3ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 18px 45px rgba(15,23,42,.09),
+                0 0 0 8px rgba(239,246,255,.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        #qrBox::before,
+        #qrBox::after {
+            content: "";
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-color: #2563eb;
+            border-style: solid;
+            z-index: 2;
+        }
+
+        #qrBox::before {
+            top: 10px;
+            left: 10px;
+            border-width: 3px 0 0 3px;
+            border-radius: 8px 0 0 0;
+        }
+
+        #qrBox::after {
+            bottom: 10px;
+            right: 10px;
+            border-width: 0 3px 3px 0;
+            border-radius: 0 0 8px 0;
         }
 
         #qrcode {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px auto;
-            min-height: 220px;
+            position: relative;
+            z-index: 1;
         }
 
-        #qrWarning {
-            display: none;
+        #qrcode img,
+        #qrcode canvas {
+            width: 250px !important;
+            height: 250px !important;
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 4px;
         }
 
-        .timer {
-            font-size: 22px;
-            font-weight: bold;
-            color: #dc3545;
+        #qrLoading {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .timer-area {
+            position: relative;
+            z-index: 2;
+        }
+
+        #timer {
+            color: #dc2626;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 25px;
+            font-weight: 800;
+            margin-top: 8px;
         }
 
         .timer-label {
-            font-size: 14px;
-            color: #6c757d;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
         }
 
-        .info-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        .refresh-btn {
+            border: 0;
+            border-radius: 13px;
+            padding: 12px 23px;
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #4f46e5
+            );
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow:
+                0 10px 22px rgba(37,99,235,.25);
+            transition: .2s ease;
         }
 
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 14px 28px rgba(37,99,235,.32);
+        }
+
+        .refresh-btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #qrStatus {
+            min-height: 22px;
+            font-size: 12px;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ================= STATS ================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            padding: 23px;
+            border-radius: 21px;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 35px rgba(15,23,42,.05);
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(37,99,235,.06);
+            right: -45px;
+            top: -45px;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 7px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ================= HISTORY ================= */
+
+        .history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .history-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .history-refresh {
+            border: 1px solid #dbe3ee;
+            background: white;
+            color: #2563eb;
+            border-radius: 11px;
+            padding: 8px 13px;
+            font-size: 12px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .history-refresh:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .history-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e7edf5;
+            border-radius: 16px;
+        }
+
+        .history-table {
+            min-width: 600px;
+            margin: 0;
+        }
+
+        .history-table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            border-bottom: 1px solid #e5eaf1;
+            padding: 14px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .history-table tbody td {
+            padding: 15px 14px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf1f5;
+            font-size: 12px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        .approved-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 8px 15px 30px;
+        }
+
+        /* ================= ANIMATION ================= */
+
+        .card-modern,
+        .stat-card {
+            animation: fadeUp .45s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 768px) {
+
+            .topbar-inner {
+                min-height: 68px;
+            }
+
+            .brand-logo {
+                width: 39px;
+                height: 39px;
+                border-radius: 12px;
+            }
+
+            .brand {
+                font-size: 15px;
+            }
+
+            .brand-subtitle {
+                font-size: 9px;
+            }
+
+            .logout-btn {
+                padding: 8px 11px;
+                font-size: 11px;
+            }
+
+            .main-container {
+                width: min(100% - 24px, 1180px);
+                padding-top: 28px;
+            }
+
+            .welcome-row {
+                display: block;
+            }
+
+            .security-pill {
+                display: inline-flex;
+                margin-top: 15px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-modern {
+                border-radius: 20px;
+                padding: 20px;
+            }
+
+            .profile-card {
+                align-items: flex-start;
+            }
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 22px;
+                border-radius: 17px;
+            }
+
+            .student-name {
+                font-size: 18px;
+            }
+
+            #qrBox {
+                width: 270px;
+                height: 270px;
+            }
+
+            #qrcode img,
+            #qrcode canvas {
+                width: 225px !important;
+                height: 225px !important;
+            }
+
+            .history-head {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            #qrBox {
+                width: 240px;
+                height: 240px;
+            }
+
+            #qrcode img,
+            #qrcode canvas {
+                width: 200px !important;
+                height: 200px !important;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+        }
+
+        /* ================= ACCESSIBILITY ================= */
+
+        button:focus-visible {
+            outline: 3px solid rgba(37,99,235,.3);
+            outline-offset: 3px;
+        }
     </style>
-
 </head>
-
 
 <body>
 
-
 <!-- ================= NAVBAR ================= -->
 
-<nav class="navbar navbar-dark">
+<nav class="topbar">
 
-    <div class="container">
+    <div class="container topbar-inner d-flex justify-content-between align-items-center">
 
-        <a
-            class="navbar-brand"
-            href="dashboard.html"
-        >
-            SRM AP DayPass
-        </a>
+        <div class="brand-area">
 
+            <div class="brand-logo">
+                🎓
+            </div>
 
-        <div>
+            <div>
+                <div class="brand">
+                    SRM AP DayPass
+                </div>
 
-            <a
-                href="history.html"
-                class="btn btn-outline-light btn-sm me-2"
-            >
-                Entry History
-            </a>
-
-
-            <button
-                class="btn btn-danger btn-sm"
-                onclick="logout()"
-            >
-                Logout
-            </button>
+                <div class="brand-subtitle">
+                    Student Entry Management System
+                </div>
+            </div>
 
         </div>
+
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
 
     </div>
 
@@ -142,50 +828,63 @@
 
 <!-- ================= MAIN ================= -->
 
-<div class="container py-4">
-
+<main class="main-container">
 
     <!-- WELCOME -->
 
-    <div class="welcome-card mb-4">
+    <div class="welcome-row">
 
-        <h2>
+        <div class="welcome">
 
-            Welcome,
-            <span id="studentName">
-                Student
-            </span>
-            👋
+            <div class="welcome-label">
+                ✦ STUDENT PORTAL
+            </div>
 
-        </h2>
+            <h1>
+                Student Dashboard
+            </h1>
 
-        <p class="mb-1">
-            SRM AP DayPass Student Dashboard
-        </p>
+            <p>
+                Manage your campus entry pass and view your entry activity.
+            </p>
 
-        <small>
-            Manage your daily campus entry pass.
-        </small>
+        </div>
+
+        <div class="security-pill">
+
+            <span class="security-dot"></span>
+
+            Secure connection
+
+        </div>
 
     </div>
 
 
+    <!-- ================= PROFILE ================= -->
 
-    <!-- ================= STUDENT INFO ================= -->
+    <div class="card-modern">
 
-    <div class="row g-3 mb-4">
+        <div class="profile-card">
 
+            <div
+                class="avatar"
+                id="avatar"
+            >
+                A
+            </div>
 
-        <div class="col-md-4">
-
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Student ID
-                </h6>
+            <div>
 
                 <div
-                    class="fw-bold"
+                    class="student-name"
+                    id="studentName"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    class="student-id"
                     id="studentId"
                 >
                     Loading...
@@ -196,17 +895,48 @@
         </div>
 
 
+        <div class="info-grid">
 
-        <div class="col-md-4">
+            <div class="info-box">
 
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Account Status
-                </h6>
+                <div class="info-label">
+                    Email
+                </div>
 
                 <div
-                    class="fw-bold text-success"
+                    class="info-value"
+                    id="studentEmail"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Student Type
+                </div>
+
+                <div
+                    class="info-value"
+                    id="studentType"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Account Status
+                </div>
+
+                <div
+                    class="info-value"
                     id="accountStatus"
                 >
                     Loading...
@@ -216,441 +946,553 @@
 
         </div>
 
-
-
-        <div class="col-md-4">
-
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Email
-                </h6>
-
-                <div
-                    class="fw-bold"
-                    id="studentEmail"
-                >
-                    Loading...
-                </div>
-
-            </div>
-
-        </div>
-
     </div>
 
 
+    <!-- ================= QR ================= -->
 
-    <!-- ================= ENTRY STATS ================= -->
+    <div class="card-modern qr-card">
 
-    <div class="row g-3 mb-4">
+        <div class="qr-header">
 
-
-        <div class="col-md-4">
-
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Today's Entries
-                </h6>
-
-                <div
-                    class="stat-number text-primary"
-                    id="todayEntries"
-                >
-                    0
-                </div>
-
+            <div class="qr-icon">
+                ▦
             </div>
 
-        </div>
+            <h2>
+                My Entry QR
+            </h2>
 
-
-
-        <div class="col-md-4">
-
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Remaining Today
-                </h6>
-
-                <div
-                    class="stat-number text-success"
-                    id="remainingEntries"
-                >
-                    3
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="col-md-4">
-
-            <div class="stat-card bg-white">
-
-                <h6>
-                    Daily Limit
-                </h6>
-
-                <div
-                    class="stat-number text-dark"
-                >
-                    3
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================= QR CARD ================= -->
-
-    <div class="card qr-card mb-4">
-
-        <div class="card-body text-center">
-
-
-            <h3>
-                🎫 Your Entry QR Code
-            </h3>
-
-
-            <p class="text-muted">
-                Show this QR code at the security gate.
+            <p class="qr-description">
+                Show this temporary QR code to Security at the campus gate.
             </p>
 
-
-            <!-- QR -->
-
-            <div id="qrcode"></div>
+        </div>
 
 
-            <!-- TIMER -->
+        <div class="qr-wrapper">
 
-            <div class="mt-3">
+            <div id="qrBox">
 
-                <div class="timer-label">
-                    QR Code refreshes in
+                <div id="qrLoading">
+                    Generating secure QR...
                 </div>
 
-                <div
-                    class="timer"
-                    id="qrTimer"
-                >
-                    30 seconds
-                </div>
+                <div id="qrcode"></div>
 
             </div>
 
-
-            <p class="text-muted mt-2">
-
-                A new QR code is generated
-                automatically every 30 seconds.
-
-            </p>
+        </div>
 
 
-            <!-- REFRESH -->
+        <div class="timer-area">
+
+            <div id="timer">
+                --
+            </div>
+
+            <div class="timer-label">
+                QR expires automatically for security
+            </div>
+
+        </div>
+
+
+        <div class="mt-4">
 
             <button
-                class="btn btn-primary"
+                id="refreshQrBtn"
+                class="refresh-btn"
                 onclick="generateQR()"
             >
-                🔄 Refresh QR Now
+                ↻ &nbsp; Refresh QR
             </button>
 
+        </div>
 
 
-            <!-- ================= WARNING ================= -->
+        <div
+            id="qrStatus"
+            class="mt-3"
+        ></div>
+
+    </div>
+
+
+    <!-- ================= STATISTICS ================= -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🚪
+            </div>
 
             <div
-                id="qrWarning"
-                class="alert alert-danger mt-4 mb-0"
+                class="stat-number"
+                id="todayCount"
             >
+                0
+            </div>
 
-                <strong>
-                    🚫 Daily Limit Reached
-                </strong>
+            <div class="stat-label">
+                Entries Today
+            </div>
 
-                <br>
+        </div>
 
-                Daily entry limit reached.
-                Maximum 3 entries allowed per day.
 
-                <hr>
+        <div class="stat-card">
 
-                <strong>
-                    Entry Limit:
-                </strong>
+            <div class="stat-icon">
+                🎯
+            </div>
 
+            <div
+                class="stat-number"
+                id="dailyLimit"
+            >
                 3
+            </div>
 
-                <br>
-
-                <strong>
-                    Remaining:
-                </strong>
-
-                <span id="warningRemaining">
-                    0
-                </span>
-
+            <div class="stat-label">
+                Daily Entry Limit
             </div>
 
         </div>
 
     </div>
-
 
 
     <!-- ================= HISTORY ================= -->
 
-    <div class="text-center mb-4">
+    <div class="card-modern mt-4">
 
-        <a
-            href="history.html"
-            class="btn btn-dark"
-        >
-            📋 View Entry History
-        </a>
+        <div class="history-head">
 
-    </div>
+            <div>
+
+                <div class="card-title">
+                    Entry History
+                </div>
+
+                <div class="history-subtitle">
+                    Your recent campus entry records
+                </div>
+
+            </div>
 
 
+            <button
+                class="history-refresh"
+                onclick="loadHistory()"
+            >
+                ↻ Refresh
+            </button>
 
-    <!-- ================= INSTRUCTIONS ================= -->
+        </div>
 
-    <div class="card info-card">
 
-        <div class="card-body">
+        <div class="history-wrapper">
 
-            <h4>
-                📌 Instructions
-            </h4>
+            <table class="table history-table">
 
-            <ol>
+                <thead>
 
-                <li>
-                    Generate your QR code.
-                </li>
+                    <tr>
 
-                <li>
-                    Show the QR code to security.
-                </li>
+                        <th>
+                            Date
+                        </th>
 
-                <li>
-                    Security scans and verifies your QR.
-                </li>
+                        <th>
+                            Time
+                        </th>
 
-                <li>
-                    You can enter the campus a maximum
-                    of <strong>3 times per day.</strong>
-                </li>
+                        <th>
+                            Gate
+                        </th>
 
-                <li>
-                    Check Entry History to see your
-                    successful entries.
-                </li>
+                        <th>
+                            Status
+                        </th>
 
-            </ol>
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="historyBody">
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="text-center text-muted py-4"
+                        >
+                            Loading history...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
 
         </div>
 
     </div>
 
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<div class="footer">
+
+    SRM AP DayPass • Student Portal
+
 </div>
 
+
+<!-- ================= FIREBASE ================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+<!-- QR LIBRARY -->
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+
+<!-- FIREBASE CONFIG -->
+
+<script src="firebase-config.js"></script>
 
 
 <script>
 
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-let currentStudent = null;
-
-const DAILY_LIMIT = 3;
-
-const QR_DURATION = 30;
-
-let qrSeconds = QR_DURATION;
-
-let qrTimerInterval = null;
+"use strict";
 
 
+let currentUser = null;
+let countdownInterval = null;
 
-/* =====================================================
-   INDIA DATE
-===================================================== */
 
-function getIndiaDate() {
+/* =========================================================
+   AUTHENTICATION
+   ========================================================= */
 
-    return new Intl.DateTimeFormat(
-        "en-CA",
-        {
-            timeZone: "Asia/Kolkata",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        }
-    ).format(new Date());
+async function requireLoggedIn() {
+
+    return new Promise((resolve, reject) => {
+
+        const unsubscribe =
+            auth.onAuthStateChanged(user => {
+
+                unsubscribe();
+
+                if (user) {
+
+                    resolve(user);
+
+                } else {
+
+                    window.location.replace(
+                        "index.html"
+                    );
+
+                    reject(
+                        new Error(
+                            "Login required."
+                        )
+                    );
+
+                }
+
+            });
+
+    });
 
 }
 
 
+/* =========================================================
+   API REQUEST
+   ========================================================= */
 
-/* =====================================================
-   LOAD STUDENT
-===================================================== */
+async function apiRequest(
+    url,
+    options = {}
+) {
 
-async function loadStudent() {
+    const user =
+        auth.currentUser;
+
+    if (!user) {
+
+        throw new Error(
+            "Authentication required."
+        );
+
+    }
+
+    const token =
+        await user.getIdToken(true);
+
+    const headers = {
+
+        "Content-Type":
+            "application/json",
+
+        "Authorization":
+            `Bearer ${token}`,
+
+        ...(options.headers || {})
+
+    };
+
+
+    const response =
+        await fetch(
+            url,
+            {
+                ...options,
+                headers
+            }
+        );
+
+
+    const data =
+        await response
+            .json()
+            .catch(() => ({
+                error:
+                    "Invalid server response."
+            }));
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.error ||
+            "Request failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================================================
+   SAFE HTML
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   GET PROFILE
+   ========================================================= */
+
+async function getMyProfile() {
+
+    return await apiRequest(
+        "/api/me"
+    );
+
+}
+
+
+/* =========================================================
+   INITIALIZE DASHBOARD
+   ========================================================= */
+
+async function initializeDashboard() {
 
     try {
 
-        const user = auth.currentUser;
+        currentUser =
+            await requireLoggedIn();
 
 
-        if (!user) {
+        const profile =
+            await getMyProfile();
 
-            window.location.href =
-                "student-login.html";
+
+        if (
+            !profile ||
+            !profile.user
+        ) {
+
+            throw new Error(
+                "Student profile could not be loaded."
+            );
+
+        }
+
+
+        const user =
+            profile.user;
+
+
+        if (
+            user.role !==
+            "STUDENT"
+        ) {
+
+            alert(
+                "This page is only for students."
+            );
+
+            window.location.replace(
+                "index.html"
+            );
 
             return;
 
         }
 
 
-        const token =
-            await user.getIdToken(true);
-
-
-        const response =
-            await fetch(
-                "/api/me",
-                {
-                    method: "GET",
-
-                    headers: {
-                        "Authorization":
-                            "Bearer " + token
-                    }
-                }
-            );
-
-
-        const text =
-            await response.text();
-
-
-        let data = {};
-
-
-        try {
-
-            data = JSON.parse(text);
-
-        } catch {
-
-            throw new Error(
-                "Invalid server response."
-            );
-
-        }
-
-
         if (
-            !response.ok ||
-            !data.success
+            user.accountStatus &&
+            user.accountStatus !==
+            "ACTIVE"
         ) {
 
-            throw new Error(
-                data.message ||
-                "Unable to load student profile."
+            alert(
+                "Your account is not active."
             );
 
-        }
+            await auth.signOut();
 
-
-        currentStudent = data.user;
-
-
-        /* ADMIN */
-
-        if (
-            currentStudent.role ===
-            "admin"
-        ) {
-
-            window.location.href =
-                "admin.html";
+            window.location.replace(
+                "index.html"
+            );
 
             return;
 
         }
 
 
-        /* STUDENT DETAILS */
+        /* PROFILE */
 
         document.getElementById(
             "studentName"
         ).textContent =
-            currentStudent.name ||
+            user.name ||
             "Student";
 
 
         document.getElementById(
             "studentId"
         ).textContent =
-            currentStudent.studentId ||
-            "-";
+            user.studentId ||
+            "Student ID unavailable";
 
 
         document.getElementById(
             "studentEmail"
         ).textContent =
-            currentStudent.email ||
+            user.email ||
+            currentUser.email ||
             "-";
 
 
         document.getElementById(
+            "studentType"
+        ).textContent =
+            user.studentType ||
+            "Not specified";
+
+
+        document.getElementById(
             "accountStatus"
+        ).innerHTML = `
+
+            <span class="active-badge">
+
+                ● ${escapeHtml(
+                    user.accountStatus ||
+                    "ACTIVE"
+                )}
+
+            </span>
+
+        `;
+
+
+        /* AVATAR */
+
+        const name =
+            user.name ||
+            "Student";
+
+
+        document.getElementById(
+            "avatar"
         ).textContent =
-            currentStudent.accountStatus ||
-            currentStudent.status ||
-            "ACTIVE";
+            name
+                .charAt(0)
+                .toUpperCase();
 
 
-        /* LOAD ENTRIES */
+        /* LOAD DATA */
 
-        await loadTodayEntries();
+        await generateQR();
 
-
-        /* GENERATE QR */
-
-        generateQR();
+        await loadHistory();
 
     }
 
     catch (error) {
 
         console.error(
-            "Student loading error:",
+            "Dashboard error:",
             error
         );
 
-        alert(
+        showQRStatus(
             error.message ||
-            "Unable to load dashboard."
+            "Unable to load dashboard.",
+            true
         );
 
     }
@@ -658,392 +1500,263 @@ async function loadStudent() {
 }
 
 
-
-/* =====================================================
-   LOAD TODAY'S ENTRIES
-===================================================== */
-
-async function loadTodayEntries() {
-
-    try {
-
-        const user =
-            auth.currentUser;
-
-
-        if (
-            !user ||
-            !currentStudent
-        ) {
-
-            return;
-
-        }
-
-
-        const token =
-            await user.getIdToken(true);
-
-
-        const response =
-            await fetch(
-
-                `/api/entries/${encodeURIComponent(
-                    currentStudent.studentId
-                )}`,
-
-                {
-                    method: "GET",
-
-                    headers: {
-                        "Authorization":
-                            "Bearer " + token
-                    }
-                }
-
-            );
-
-
-        const text =
-            await response.text();
-
-
-        let data = {};
-
-
-        try {
-
-            data = JSON.parse(text);
-
-        }
-
-        catch {
-
-            throw new Error(
-                "Invalid history response."
-            );
-
-        }
-
-
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.message ||
-                "Unable to load entry history."
-            );
-
-        }
-
-
-        const entries =
-            Array.isArray(data.entries)
-                ? data.entries
-                : [];
-
-
-        const today =
-            getIndiaDate();
-
-
-        const todayEntries =
-            entries.filter(
-                entry => {
-
-                    return (
-
-                        entry.entryDate ===
-                        today &&
-
-                        entry.verificationStatus ===
-                        "SUCCESS"
-
-                    );
-
-                }
-            );
-
-
-        const count =
-            todayEntries.length;
-
-
-        const remaining =
-            Math.max(
-                0,
-                DAILY_LIMIT - count
-            );
-
-
-        /* DISPLAY */
-
-        document.getElementById(
-            "todayEntries"
-        ).textContent =
-            count;
-
-
-        document.getElementById(
-            "remainingEntries"
-        ).textContent =
-            remaining;
-
-
-        document.getElementById(
-            "warningRemaining"
-        ).textContent =
-            remaining;
-
-
-        /* WARNING */
-
-        const warning =
-            document.getElementById(
-                "qrWarning"
-            );
-
-
-        if (
-            count >= DAILY_LIMIT
-        ) {
-
-            warning.style.display =
-                "block";
-
-        }
-
-        else {
-
-            warning.style.display =
-                "none";
-
-        }
-
-
-        console.log(
-            "Today's entries:",
-            count
-        );
-
-
-        console.log(
-            "Remaining:",
-            remaining
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Entry history error:",
-            error
-        );
-
-
-        /*
-        Do not falsely show
-        daily limit if history
-        cannot be loaded.
-        */
-
-        document.getElementById(
-            "todayEntries"
-        ).textContent =
-            "0";
-
-
-        document.getElementById(
-            "remainingEntries"
-        ).textContent =
-            "3";
-
-
-        document.getElementById(
-            "warningRemaining"
-        ).textContent =
-            "3";
-
-
-        document.getElementById(
-            "qrWarning"
-        ).style.display =
-            "none";
-
-    }
-
-}
-
-
-
-/* =====================================================
+/* =========================================================
    GENERATE QR
-===================================================== */
+   ========================================================= */
 
-function generateQR() {
+async function generateQR() {
 
-    if (!currentStudent) {
+    const button =
+        document.getElementById(
+            "refreshQrBtn"
+        );
 
-        return;
 
-    }
-
-
-    const qrContainer =
+    const qr =
         document.getElementById(
             "qrcode"
         );
 
 
-    qrContainer.innerHTML = "";
+    const loading =
+        document.getElementById(
+            "qrLoading"
+        );
 
 
-    /*
-    QR DATA
-    */
+    try {
 
-    const qrData =
-        JSON.stringify({
+        button.disabled =
+            true;
 
-            studentId:
-                currentStudent.studentId,
-
-            name:
-                currentStudent.name,
-
-            timestamp:
-                Date.now()
-
-        });
+        button.textContent =
+            "Generating...";
 
 
-    /*
-    CREATE QR
-    */
+        clearCountdown();
 
-    new QRCode(
 
-        qrContainer,
+        qr.innerHTML =
+            "";
 
-        {
-            text: qrData,
 
-            width: 220,
+        loading.style.display =
+            "block";
 
-            height: 220,
+        loading.textContent =
+            "Generating secure QR...";
 
-            colorDark: "#000000",
 
-            colorLight: "#ffffff",
+        document.getElementById(
+            "timer"
+        ).textContent =
+            "--";
 
-            correctLevel:
-                QRCode.CorrectLevel.H
+
+        showQRStatus(
+            "Generating secure QR..."
+        );
+
+
+        const response =
+            await apiRequest(
+                "/api/qr"
+            );
+
+
+        console.log(
+            "QR server response:",
+            response
+        );
+
+
+        const qrData =
+            response &&
+            response.qrData;
+
+
+        if (
+            !qrData ||
+            typeof qrData !==
+            "string"
+        ) {
+
+            throw new Error(
+                "Server did not return valid QR data."
+            );
+
         }
 
-    );
+
+        loading.style.display =
+            "none";
 
 
-    /*
-    RESET TIMER
-    */
+        /* CREATE QR */
 
-    startQRTimer();
+        new QRCode(
+            qr,
+            {
 
-}
+                text: qrData,
+
+                width: 250,
+
+                height: 250,
+
+                colorDark:
+                    "#111827",
+
+                colorLight:
+                    "#ffffff",
+
+                correctLevel:
+                    QRCode.CorrectLevel.M
+
+            }
+        );
 
 
+        startCountdown(
+            30
+        );
 
-/* =====================================================
-   QR COUNTDOWN TIMER
-===================================================== */
 
-function startQRTimer() {
-
-    /*
-    Clear previous timer
-    */
-
-    if (qrTimerInterval) {
-
-        clearInterval(
-            qrTimerInterval
+        showQRStatus(
+            "✓ QR generated successfully."
         );
 
     }
 
+    catch (error) {
 
-    /*
-    Start from 30
-    */
-
-    qrSeconds =
-        QR_DURATION;
-
-
-    updateQRTimer();
-
-
-    /*
-    Countdown every second
-    */
-
-    qrTimerInterval =
-        setInterval(
-
-            function () {
-
-                qrSeconds--;
-
-                updateQRTimer();
-
-
-                /*
-                When timer reaches 0
-                */
-
-                if (
-                    qrSeconds <= 0
-                ) {
-
-                    clearInterval(
-                        qrTimerInterval
-                    );
-
-
-                    /*
-                    Generate new QR
-                    */
-
-                    generateQR();
-
-                }
-
-            },
-
-            1000
-
+        console.error(
+            "QR error:",
+            error
         );
+
+
+        qr.innerHTML =
+            "";
+
+
+        loading.style.display =
+            "block";
+
+
+        loading.textContent =
+            "Unable to display QR";
+
+
+        document.getElementById(
+            "timer"
+        ).textContent =
+            "--";
+
+
+        showQRStatus(
+            error.message ||
+            "Unable to generate QR.",
+            true
+        );
+
+    }
+
+    finally {
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            "↻  Refresh QR";
+
+    }
 
 }
 
 
+/* =========================================================
+   TIMER
+   ========================================================= */
 
-/* =====================================================
-   UPDATE TIMER TEXT
-===================================================== */
+function startCountdown(
+    seconds
+) {
 
-function updateQRTimer() {
+    clearCountdown();
+
+
+    let remaining =
+        Number(seconds);
+
+
+    updateTimer(
+        remaining
+    );
+
+
+    countdownInterval =
+        setInterval(() => {
+
+            remaining--;
+
+            updateTimer(
+                remaining
+            );
+
+
+            if (
+                remaining <= 0
+            ) {
+
+                clearCountdown();
+
+
+                document.getElementById(
+                    "qrcode"
+                ).innerHTML =
+                    "";
+
+
+                document.getElementById(
+                    "qrLoading"
+                ).style.display =
+                    "block";
+
+
+                document.getElementById(
+                    "qrLoading"
+                ).textContent =
+                    "QR expired";
+
+
+                showQRStatus(
+                    "QR expired. Refresh to generate a new QR."
+                );
+
+            }
+
+        }, 1000);
+
+}
+
+
+function updateTimer(
+    seconds
+) {
 
     const timer =
         document.getElementById(
-            "qrTimer"
+            "timer"
         );
 
 
-    if (!timer) {
+    if (
+        seconds <= 0
+    ) {
+
+        timer.textContent =
+            "Expired";
 
         return;
 
@@ -1051,35 +1764,388 @@ function updateQRTimer() {
 
 
     timer.textContent =
-        qrSeconds +
-        " seconds";
+        `Expires in ${seconds}s`;
 
 }
 
 
+function clearCountdown() {
 
-/* =====================================================
-   LOGOUT
-===================================================== */
+    if (
+        countdownInterval
+    ) {
 
-async function logout() {
+        clearInterval(
+            countdownInterval
+        );
+
+        countdownInterval =
+            null;
+
+    }
+
+}
+
+
+/* =========================================================
+   QR STATUS
+   ========================================================= */
+
+function showQRStatus(
+    message,
+    isError = false
+) {
+
+    const element =
+        document.getElementById(
+            "qrStatus"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.className =
+        "mt-3 " +
+        (
+            isError
+                ? "text-danger"
+                : "text-success"
+        );
+
+}
+
+
+/* =========================================================
+   ENTRY HISTORY
+   ========================================================= */
+
+async function loadHistory() {
+
+    const body =
+        document.getElementById(
+            "historyBody"
+        );
+
 
     try {
 
-        if (qrTimerInterval) {
+        const profile =
+            await getMyProfile();
 
-            clearInterval(
-                qrTimerInterval
+
+        const studentId =
+            profile.user.studentId;
+
+
+        if (!studentId) {
+
+            throw new Error(
+                "Student ID is missing."
             );
 
         }
 
 
+        const result =
+            await apiRequest(
+                `/api/entries/${encodeURIComponent(studentId)}`
+            );
+
+
+        const entries =
+            Array.isArray(
+                result.entries
+            )
+                ? result.entries
+                : [];
+
+
+        updateTodayCount(
+            entries
+        );
+
+
+        if (
+            entries.length === 0
+        ) {
+
+            body.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="text-center text-muted py-4"
+                    >
+
+                        No entry history yet.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        body.innerHTML =
+            entries
+                .map(entry => {
+
+                    let date =
+                        null;
+
+
+                    if (
+                        entry.createdAt
+                    ) {
+
+                        if (
+                            typeof entry.createdAt ===
+                            "string"
+                        ) {
+
+                            date =
+                                new Date(
+                                    entry.createdAt
+                                );
+
+                        }
+
+                        else if (
+                            entry.createdAt._seconds
+                        ) {
+
+                            date =
+                                new Date(
+                                    entry.createdAt._seconds *
+                                    1000
+                                );
+
+                        }
+
+                    }
+
+
+                    const dateText =
+                        date &&
+                        !isNaN(date)
+
+                            ? date.toLocaleDateString(
+                                "en-IN"
+                            )
+
+                            : "-";
+
+
+                    const timeText =
+                        date &&
+                        !isNaN(date)
+
+                            ? date.toLocaleTimeString(
+                                "en-IN",
+                                {
+                                    hour:
+                                        "2-digit",
+                                    minute:
+                                        "2-digit"
+                                }
+                            )
+
+                            : "-";
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    dateText
+                                )}
+                            </td>
+
+
+                            <td>
+                                ${escapeHtml(
+                                    timeText
+                                )}
+                            </td>
+
+
+                            <td>
+                                ${escapeHtml(
+                                    entry.gate ||
+                                    "Main Gate"
+                                )}
+                            </td>
+
+
+                            <td>
+
+                                <span class="approved-badge">
+
+                                    ${escapeHtml(
+                                        entry.status ||
+                                        "ALLOWED"
+                                    )}
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                })
+                .join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "History error:",
+            error
+        );
+
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    class="text-center text-danger py-4"
+                >
+
+                    Unable to load history.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   TODAY COUNT
+   ========================================================= */
+
+function updateTodayCount(
+    entries
+) {
+
+    const today =
+        new Date()
+            .toLocaleDateString(
+                "en-IN"
+            );
+
+
+    let count =
+        0;
+
+
+    entries.forEach(
+        entry => {
+
+            if (
+                !entry.createdAt
+            ) {
+
+                return;
+
+            }
+
+
+            let date;
+
+
+            if (
+                typeof entry.createdAt ===
+                "string"
+            ) {
+
+                date =
+                    new Date(
+                        entry.createdAt
+                    );
+
+            }
+
+            else if (
+                entry.createdAt._seconds
+            ) {
+
+                date =
+                    new Date(
+                        entry.createdAt._seconds *
+                        1000
+                    );
+
+            }
+
+
+            if (
+                !date ||
+                isNaN(date)
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                date.toLocaleDateString(
+                    "en-IN"
+                ) === today
+            ) {
+
+                count++;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "todayCount"
+    ).textContent =
+        count;
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+async function logout() {
+
+    try {
+
+        clearCountdown();
+
+
         await auth.signOut();
 
 
-        window.location.href =
-            "index.html";
+        window.location.replace(
+            "index.html"
+        );
 
     }
 
@@ -1095,34 +2161,16 @@ async function logout() {
 }
 
 
+/* =========================================================
+   START
+   ========================================================= */
 
-/* =====================================================
-   FIREBASE AUTH
-===================================================== */
-
-auth.onAuthStateChanged(
-
-    function (user) {
-
-        if (!user) {
-
-            window.location.href =
-                "student-login.html";
-
-            return;
-
-        }
-
-
-        loadStudent();
-
-    }
-
+document.addEventListener(
+    "DOMContentLoaded",
+    initializeDashboard
 );
 
 </script>
 
-
 </body>
-
 </html>

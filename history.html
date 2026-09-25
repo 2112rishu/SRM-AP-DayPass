@@ -1,493 +1,1933 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Entry History - SRM AP DayPass</title>
+  <title>Entry History | SRM AP EntryPass</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  >
 
-    <script src="firebase-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <style>
-        body {
-            background: #f5f7fb;
-        }
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
-        .navbar {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
+  <style>
 
-        .page-card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .entry-success {
-            color: #198754;
-            font-weight: 600;
-        }
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
 
-        .entry-number {
-            font-weight: bold;
-        }
+    /* SIDEBAR */
 
-        .empty-box {
-            text-align: center;
-            padding: 50px 20px;
-            color: #777;
-        }
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100vh;
 
-        .limit-card {
-            background: #eef6ff;
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 20px;
-        }
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(99,102,241,.25),
+          transparent 35%
+        ),
+        linear-gradient(
+          180deg,
+          #111827,
+          #172554
+        );
 
-        .table-responsive {
-            border-radius: 12px;
-        }
-    </style>
+      color: white;
+      padding: 24px 16px;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px 28px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6366f1,
+          #06b6d4
+        );
+
+      font-size: 20px;
+    }
+
+    .brand h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .brand small {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+
+    .nav-link {
+      color: #cbd5e1;
+      padding: 13px 14px;
+      margin: 5px 0;
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      text-decoration: none;
+
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: white;
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(99,102,241,.4),
+          rgba(6,182,212,.15)
+        );
+    }
+
+    .sidebar-bottom {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 20px;
+    }
+
+    /* MAIN */
+
+    .main {
+      margin-left: 250px;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 26px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .page-title p {
+      margin: 6px 0 0;
+
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .admin-badge {
+      background: white;
+
+      border: 1px solid #e2e8f0;
+
+      padding: 10px 15px;
+
+      border-radius: 14px;
+
+      font-size: 12px;
+      font-weight: 700;
+
+      box-shadow:
+        0 5px 20px rgba(15,23,42,.05);
+    }
+
+    /* STATS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+
+      gap: 18px;
+
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: white;
+
+      border: 1px solid #e8edf5;
+
+      border-radius: 18px;
+
+      padding: 20px;
+
+      box-shadow:
+        0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #eef2ff;
+
+      color: #4f46e5;
+
+      font-size: 18px;
+
+      margin-bottom: 14px;
+    }
+
+    .stat-card h2 {
+      margin: 0;
+
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .stat-card p {
+      margin: 4px 0 0;
+
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    /* HISTORY CARD */
+
+    .history-card {
+      background: white;
+
+      border: 1px solid #e8edf5;
+
+      border-radius: 20px;
+
+      box-shadow:
+        0 10px 35px rgba(15,23,42,.06);
+
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      padding: 20px 22px;
+
+      border-bottom: 1px solid #edf1f6;
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 800;
+
+      margin-bottom: 15px;
+    }
+
+    .filters {
+      display: grid;
+
+      grid-template-columns:
+        1fr 180px 180px auto;
+
+      gap: 10px;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 11px;
+
+      border: 1px solid #dbe2ea;
+
+      padding: 10px 12px;
+
+      font-size: 12px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #6366f1;
+
+      box-shadow:
+        0 0 0 3px rgba(99,102,241,.1);
+    }
+
+    .btn-refresh {
+      border: none;
+
+      border-radius: 11px;
+
+      padding: 10px 15px;
+
+      background: #111827;
+
+      color: white;
+
+      font-weight: 700;
+
+      font-size: 12px;
+    }
+
+    /* TABLE */
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+
+      border-collapse: collapse;
+
+      min-width: 1050px;
+    }
+
+    th {
+      background: #f8fafc;
+
+      color: #64748b;
+
+      font-size: 10px;
+
+      text-transform: uppercase;
+
+      letter-spacing: .06em;
+
+      padding: 14px 18px;
+
+      text-align: left;
+
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 15px 18px;
+
+      border-top: 1px solid #eef2f7;
+
+      font-size: 12px;
+
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #fafbff;
+    }
+
+    /* STUDENT */
+
+    .student-name {
+      font-weight: 700;
+    }
+
+    .student-id {
+      color: #64748b;
+
+      font-size: 10px;
+
+      margin-top: 3px;
+    }
+
+    /* DATE */
+
+    .date {
+      font-weight: 600;
+    }
+
+    .time {
+      color: #64748b;
+
+      font-size: 10px;
+
+      margin-top: 3px;
+    }
+
+    /* STATUS */
+
+    .status {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      padding: 6px 10px;
+
+      border-radius: 999px;
+
+      font-size: 10px;
+
+      font-weight: 800;
+    }
+
+    .status.allowed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* VERIFIED BY */
+
+    .verified-box {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .verified-icon {
+      width: 32px;
+      height: 32px;
+
+      flex-shrink: 0;
+
+      border-radius: 9px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #eef2ff;
+
+      color: #4f46e5;
+
+      font-size: 14px;
+    }
+
+    .verified-name {
+      font-weight: 700;
+
+      color: #1e293b;
+
+      font-size: 11px;
+
+      max-width: 190px;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+    }
+
+    .verified-label {
+      color: #94a3b8;
+
+      font-size: 9px;
+
+      margin-top: 2px;
+    }
+
+    /* ROLE */
+
+    .role-badge {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      padding: 7px 10px;
+
+      border-radius: 9px;
+
+      background: #f1f5f9;
+
+      color: #334155;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      letter-spacing: .03em;
+    }
+
+    .role-badge.security {
+      background: #ecfeff;
+      color: #0e7490;
+    }
+
+    .role-badge.admin {
+      background: #eef2ff;
+      color: #4338ca;
+    }
+
+    .role-badge.super {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .empty {
+      text-align: center;
+
+      padding: 60px 20px;
+
+      color: #64748b;
+    }
+
+    .empty i {
+      display: block;
+
+      font-size: 40px;
+
+      margin-bottom: 10px;
+
+      color: #94a3b8;
+    }
+
+    .loading {
+      text-align: center;
+
+      padding: 50px;
+
+      color: #64748b;
+    }
+
+    .mobile-menu {
+      display: none;
+
+      width: 42px;
+      height: 42px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background: #111827;
+
+      color: white;
+    }
+
+    @media(max-width:1100px) {
+
+      .stats {
+        grid-template-columns: repeat(2,1fr);
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+    }
+
+    @media(max-width:768px) {
+
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+
+        padding: 20px 15px;
+      }
+
+      .mobile-menu {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .topbar-left {
+        display: flex;
+
+        gap: 12px;
+
+        align-items: flex-start;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-badge {
+        display: none;
+      }
+
+    }
+
+    @media(max-width:500px) {
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title h1 {
+        font-size: 23px;
+      }
+
+    }
+
+  </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-        <span class="navbar-brand fw-bold">
-            🎓 SRM AP DayPass
-        </span>
+  <!-- SIDEBAR -->
 
-        <div>
-            <a href="dashboard.html" class="btn btn-light btn-sm me-2">
-                Dashboard
-            </a>
+  <aside class="sidebar" id="sidebar">
 
-            <button onclick="logout()" class="btn btn-outline-light btn-sm">
-                Logout
-            </button>
-        </div>
-    </div>
-</nav>
+    <div class="brand">
 
-<div class="container py-4">
+      <div class="brand-icon">
+        <i class="bi bi-qr-code-scan"></i>
+      </div>
 
-    <div class="page-card">
+      <div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold mb-1">Entry History</h2>
-                <p class="text-muted mb-0">
-                    Record of successful DayPass entries
-                </p>
-            </div>
+        <h4>EntryPass</h4>
 
-            <button
-                onclick="loadHistory()"
-                class="btn btn-primary"
-            >
-                🔄 Refresh
-            </button>
-        </div>
+        <small>
+          SRM AP Campus
+        </small>
 
-        <!-- Daily Limit -->
-        <div class="limit-card">
-            <div class="row text-center">
-
-                <div class="col-md-4">
-                    <h5 class="mb-1">Daily Limit</h5>
-                    <h3 class="fw-bold">3</h3>
-                </div>
-
-                <div class="col-md-4">
-                    <h5 class="mb-1">Today's Entries</h5>
-                    <h3 class="fw-bold" id="todayCount">0</h3>
-                </div>
-
-                <div class="col-md-4">
-                    <h5 class="mb-1">Remaining</h5>
-                    <h3 class="fw-bold" id="remainingCount">3</h3>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Loading -->
-        <div id="loading" class="text-center py-4">
-            <div class="spinner-border text-primary"></div>
-            <p class="mt-2 text-muted">
-                Loading entry history...
-            </p>
-        </div>
-
-        <!-- Error -->
-        <div
-            id="errorBox"
-            class="alert alert-danger d-none"
-        ></div>
-
-        <!-- Empty -->
-        <div
-            id="emptyBox"
-            class="empty-box d-none"
-        >
-            <h4>No entries yet</h4>
-            <p>
-                Successful QR verifications will appear here.
-            </p>
-        </div>
-
-        <!-- Table -->
-        <div
-            id="tableContainer"
-            class="table-responsive d-none"
-        >
-            <table class="table table-hover align-middle">
-
-                <thead class="table-primary">
-                    <tr>
-                        <th>#</th>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Entry</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-
-                <tbody id="historyTable">
-                </tbody>
-
-            </table>
-        </div>
+      </div>
 
     </div>
 
-</div>
 
-<script>
+    <a
+      href="super-admin-management.html"
+      class="nav-link"
+    >
+      <i class="bi bi-grid-1x2-fill"></i>
+      Control Center
+    </a>
 
-    let currentUser = null;
-    let currentProfile = null;
 
-    // -----------------------------------------
-    // WAIT FOR LOGIN
-    // -----------------------------------------
+    <a
+      href="admin.html"
+      class="nav-link"
+    >
+      <i class="bi bi-journal-check"></i>
+      Entry Records
+    </a>
 
-    auth.onAuthStateChanged(async function(user) {
 
-        if (!user) {
-            window.location.href = "index.html";
-            return;
-        }
+    <a
+      href="history.html"
+      class="nav-link active"
+    >
+      <i class="bi bi-clock-history"></i>
+      History
+    </a>
 
-        currentUser = user;
 
-        try {
+    <a
+      href="security.html"
+      class="nav-link"
+    >
+      <i class="bi bi-qr-code-scan"></i>
+      QR Scanner
+    </a>
 
-            const token = await user.getIdToken();
 
-            const response = await fetch("/api/me", {
-                headers: {
-                    Authorization: "Bearer " + token
-                }
-            });
+    <a
+      href="admin-management.html"
+      class="nav-link"
+    >
+      <i class="bi bi-people-fill"></i>
+      User Management
+    </a>
 
-            const data = await response.json();
 
-            if (!data.success) {
-                throw new Error(data.message);
-            }
+    <div class="sidebar-bottom">
 
-            currentProfile = data.user;
+      <button
+        class="nav-link w-100 border-0"
+        style="background:transparent;"
+        onclick="logout()"
+      >
 
-            await loadHistory();
+        <i class="bi bi-box-arrow-right"></i>
 
-        } catch (error) {
+        Logout
 
-            console.error(error);
+      </button>
 
-            showError(
-                error.message || "Unable to load profile."
-            );
-        }
+    </div>
 
-    });
+  </aside>
 
 
-    // -----------------------------------------
-    // LOAD HISTORY
-    // -----------------------------------------
+  <!-- MAIN -->
 
-    async function loadHistory() {
+  <main class="main">
 
-        document
-            .getElementById("loading")
-            .classList.remove("d-none");
+    <div class="topbar">
 
-        document
-            .getElementById("errorBox")
-            .classList.add("d-none");
+      <div class="topbar-left">
 
-        document
-            .getElementById("emptyBox")
-            .classList.add("d-none");
+        <button
+          class="mobile-menu"
+          onclick="toggleSidebar()"
+        >
+          <i class="bi bi-list"></i>
+        </button>
 
-        document
-            .getElementById("tableContainer")
-            .classList.add("d-none");
 
-        try {
+        <div class="page-title">
 
-            const token = await currentUser.getIdToken();
+          <h1>
+            Entry History
+          </h1>
 
-            let url = "/api/entries";
+          <p>
+            Complete campus entry and verification history.
+          </p>
 
-            // Student sees only their own entries
-            if (
-                currentProfile &&
-                currentProfile.role !== "admin"
-            ) {
-                url =
-                    "/api/entries/" +
-                    encodeURIComponent(
-                        currentProfile.studentId
-                    );
-            }
+        </div>
 
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: "Bearer " + token
-                }
-            });
+      </div>
 
-            const data = await response.json();
 
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.message ||
-                    "Unable to load history."
-                );
-            }
+      <div
+        class="admin-badge"
+        id="userBadge"
+      >
 
-            displayEntries(data.entries || []);
+        <i class="bi bi-shield-check me-1"></i>
 
-        } catch (error) {
+        Super Admin
 
-            console.error(error);
+      </div>
 
-            showError(
-                error.message ||
-                "Unable to load entry history."
-            );
+    </div>
 
-        } finally {
 
-            document
-                .getElementById("loading")
-                .classList.add("d-none");
-        }
-    }
+    <!-- STATS -->
 
+    <section class="stats">
 
-    // -----------------------------------------
-    // DISPLAY ENTRIES
-    // -----------------------------------------
+      <div class="stat-card">
 
-    function displayEntries(entries) {
+        <div class="stat-icon">
+          <i class="bi bi-journal-text"></i>
+        </div>
 
-        const table =
-            document.getElementById("historyTable");
+        <h2 id="totalEntries">
+          0
+        </h2>
 
-        table.innerHTML = "";
+        <p>
+          Total Entries
+        </p>
 
-        if (entries.length === 0) {
+      </div>
 
-            document
-                .getElementById("emptyBox")
-                .classList.remove("d-none");
 
-            updateDailyCount([]);
+      <div class="stat-card">
 
-            return;
-        }
+        <div class="stat-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
 
-        document
-            .getElementById("tableContainer")
-            .classList.remove("d-none");
+        <h2 id="allowedEntries">
+          0
+        </h2>
 
-        entries.forEach(function(entry, index) {
+        <p>
+          Allowed Entries
+        </p>
 
-            const row =
-                document.createElement("tr");
+      </div>
 
-            const date =
-                entry.entryDate || "-";
 
-            const time =
-                getEntryTime(entry);
+      <div class="stat-card">
 
-            row.innerHTML = `
-                <td>${index + 1}</td>
+        <div class="stat-icon">
+          <i class="bi bi-x-circle"></i>
+        </div>
 
-                <td>
-                    <strong>
-                        ${escapeHTML(entry.studentId || "-")}
-                    </strong>
-                </td>
+        <h2 id="rejectedEntries">
+          0
+        </h2>
 
-                <td>
-                    ${escapeHTML(entry.name || "-")}
-                </td>
+        <p>
+          Rejected Entries
+        </p>
 
-                <td>
-                    ${escapeHTML(date)}
-                </td>
+      </div>
 
-                <td>
-                    ${escapeHTML(time)}
-                </td>
 
-                <td class="entry-number">
-                    Entry ${entry.entryNumber || "-"} / 3
-                </td>
+      <div class="stat-card">
 
-                <td class="entry-success">
-                    ✓ SUCCESS
-                </td>
-            `;
+        <div class="stat-icon">
+          <i class="bi bi-people"></i>
+        </div>
 
-            table.appendChild(row);
+        <h2 id="uniqueStudents">
+          0
+        </h2>
 
-        });
+        <p>
+          Students Recorded
+        </p>
 
-        updateDailyCount(entries);
-    }
+      </div>
 
+    </section>
 
-    // -----------------------------------------
-    // TODAY'S COUNT
-    // -----------------------------------------
 
-    function updateDailyCount(entries) {
+    <!-- HISTORY -->
 
-        const today =
-            new Intl.DateTimeFormat(
-                "en-CA",
-                {
-                    timeZone: "Asia/Kolkata",
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit"
-                }
-            ).format(new Date());
+    <section class="history-card">
 
-        const todayEntries =
-            entries.filter(function(entry) {
+      <div class="card-header-custom">
 
-                return entry.entryDate === today;
+        <div class="header-title">
 
-            });
+          <i class="bi bi-clock-history me-2"></i>
 
-        const count = todayEntries.length;
+          Complete Entry History
 
-        document.getElementById(
-            "todayCount"
-        ).textContent = count;
+        </div>
 
-        document.getElementById(
-            "remainingCount"
-        ).textContent =
-            Math.max(0, 3 - count);
-    }
 
+        <div class="filters">
 
-    // -----------------------------------------
-    // GET TIME
-    // -----------------------------------------
+          <input
+            type="text"
+            id="searchInput"
+            class="form-control"
+            placeholder="🔍 Search student, ID or verifier..."
+          >
 
-    function getEntryTime(entry) {
 
-        if (
-            entry.createdAt &&
-            entry.createdAt._seconds
-        ) {
+          <input
+            type="date"
+            id="dateFilter"
+            class="form-control"
+          >
 
-            const date =
-                new Date(
-                    entry.createdAt._seconds * 1000
-                );
 
-            return date.toLocaleTimeString(
-                "en-IN",
-                {
-                    timeZone: "Asia/Kolkata",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit"
-                }
-            );
-        }
+          <select
+            id="statusFilter"
+            class="form-select"
+          >
 
-        return "-";
-    }
+            <option value="ALL">
+              All Status
+            </option>
 
+            <option value="ALLOWED">
+              Allowed
+            </option>
 
-    // -----------------------------------------
-    // ERROR
-    // -----------------------------------------
+            <option value="REJECTED">
+              Rejected
+            </option>
 
-    function showError(message) {
+          </select>
 
-        const box =
-            document.getElementById("errorBox");
 
-        box.textContent = message;
+          <button
+            class="btn-refresh"
+            onclick="loadHistory()"
+          >
 
-        box.classList.remove("d-none");
-    }
+            <i class="bi bi-arrow-clockwise me-1"></i>
 
+            Refresh
 
-    // -----------------------------------------
-    // HTML SECURITY
-    // -----------------------------------------
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Student
+              </th>
+
+              <th>
+                Student Type
+              </th>
+
+              <th>
+                Date & Time
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Verified By
+              </th>
+
+              <th>
+                Verified Role
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="historyBody">
+
+            <tr>
+
+              <td colspan="6">
+
+                <div class="loading">
+
+                  <div
+                    class="spinner-border spinner-border-sm me-2"
+                  ></div>
+
+                  Loading history...
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- FIREBASE -->
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+
+
+  <script>
+
+    let allEntries = [];
+
 
     function escapeHTML(value) {
 
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
     }
 
 
-    // -----------------------------------------
-    // LOGOUT
-    // -----------------------------------------
+    function getToken() {
 
-    async function logout() {
+      return sessionStorage.getItem(
+        "entrypass_token"
+      );
 
-        await auth.signOut();
+    }
+
+
+    async function apiFetch(
+      url,
+      options = {}
+    ) {
+
+      const token =
+        getToken();
+
+
+      if (!token) {
+
+        throw new Error(
+          "Authentication required."
+        );
+
+      }
+
+
+      const headers = {
+
+        ...(options.headers || {}),
+
+        Authorization:
+          `Bearer ${token}`,
+
+        "Content-Type":
+          "application/json"
+
+      };
+
+
+      const response =
+        await fetch(
+          url,
+          {
+            ...options,
+            headers
+          }
+        );
+
+
+      const data =
+        await response
+          .json()
+          .catch(() => ({}));
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Request failed."
+        );
+
+      }
+
+
+      return data;
+
+    }
+
+
+    /* SUPER ADMIN ACCESS */
+
+    async function checkAccess() {
+
+      try {
+
+        const data =
+          await apiFetch(
+            "/api/me"
+          );
+
+
+        const user =
+          data.user || data;
+
+
+        const role =
+          String(
+            user.role || ""
+          ).toUpperCase();
+
+
+        if (
+          role !==
+          "SUPER_ADMIN"
+        ) {
+
+          alert(
+            "Access denied. Only Super Admin can view complete history."
+          );
+
+
+          window.location.href =
+            "admin-login.html";
+
+
+          return false;
+
+        }
+
+
+        document.getElementById(
+          "userBadge"
+        ).innerHTML = `
+
+          <i class="bi bi-shield-check me-1"></i>
+
+          ${escapeHTML(
+            user.name ||
+            "Super Admin"
+          )}
+
+        `;
+
+
+        return true;
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        sessionStorage.clear();
 
         window.location.href =
-            "index.html";
+          "admin-login.html";
+
+        return false;
+
+      }
+
     }
 
-</script>
+
+    /* LOAD HISTORY */
+
+    async function loadHistory() {
+
+      try {
+
+        const data =
+          await apiFetch(
+            "/api/admin/entries"
+          );
+
+
+        allEntries =
+          Array.isArray(
+            data.entries
+          )
+            ? data.entries
+            : [];
+
+
+        renderHistory();
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+          "historyBody"
+        ).innerHTML = `
+
+          <tr>
+
+            <td colspan="6">
+
+              <div class="empty">
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                <strong>
+                  Unable to load history
+                </strong>
+
+                <div class="mt-1">
+                  ${escapeHTML(
+                    error.message
+                  )}
+                </div>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+
+    }
+
+
+    /* DATE */
+
+    function getEntryDate(entry) {
+
+      if (entry.createdAt) {
+
+        if (
+          typeof entry.createdAt ===
+          "string"
+        ) {
+
+          return new Date(
+            entry.createdAt
+          );
+
+        }
+
+
+        if (
+          entry.createdAt._seconds
+        ) {
+
+          return new Date(
+            entry.createdAt._seconds *
+            1000
+          );
+
+        }
+
+      }
+
+
+      if (entry.timestamp) {
+
+        return new Date(
+          entry.timestamp
+        );
+
+      }
+
+
+      return null;
+
+    }
+
+
+    function formatDateTime(entry) {
+
+      const date =
+        getEntryDate(entry);
+
+
+      if (
+        !date ||
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return {
+          date: "-",
+          time: "-"
+        };
+
+      }
+
+
+      return {
+
+        date:
+          date.toLocaleDateString(
+            "en-IN",
+            {
+              day: "2-digit",
+              month: "short",
+              year: "numeric"
+            }
+          ),
+
+        time:
+          date.toLocaleTimeString(
+            "en-IN",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit"
+            }
+          )
+
+      };
+
+    }
+
+
+    /* ROLE STYLE */
+
+    function getRoleClass(role) {
+
+      const value =
+        String(
+          role || ""
+        ).toUpperCase();
+
+
+      if (
+        value ===
+        "SECURITY"
+      ) {
+
+        return "security";
+
+      }
+
+
+      if (
+        value ===
+        "ADMIN"
+      ) {
+
+        return "admin";
+
+      }
+
+
+      if (
+        value ===
+        "SUPER_ADMIN"
+      ) {
+
+        return "super";
+
+      }
+
+
+      return "";
+
+    }
+
+
+    function getRoleIcon(role) {
+
+      const value =
+        String(
+          role || ""
+        ).toUpperCase();
+
+
+      if (
+        value ===
+        "SECURITY"
+      ) {
+
+        return "bi-shield-check";
+
+      }
+
+
+      if (
+        value ===
+        "ADMIN"
+      ) {
+
+        return "bi-person-badge";
+
+      }
+
+
+      if (
+        value ===
+        "SUPER_ADMIN"
+      ) {
+
+        return "bi-shield-lock-fill";
+
+      }
+
+
+      return "bi-person-check";
+
+    }
+
+
+    /* RENDER */
+
+    function renderHistory() {
+
+      const search =
+        document
+          .getElementById(
+            "searchInput"
+          )
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const dateFilter =
+        document
+          .getElementById(
+            "dateFilter"
+          )
+          .value;
+
+
+      const statusFilter =
+        document
+          .getElementById(
+            "statusFilter"
+          )
+          .value;
+
+
+      const filtered =
+        allEntries.filter(
+          entry => {
+
+            const studentName =
+              String(
+                entry.studentName ||
+                ""
+              ).toLowerCase();
+
+
+            const studentId =
+              String(
+                entry.studentId ||
+                ""
+              ).toLowerCase();
+
+
+            const verifiedBy =
+              String(
+                entry.verifiedBy ||
+                ""
+              ).toLowerCase();
+
+
+            const verifiedRole =
+              String(
+                entry.verifiedByRole ||
+                ""
+              ).toLowerCase();
+
+
+            const searchableText =
+              `
+              ${studentName}
+              ${studentId}
+              ${verifiedBy}
+              ${verifiedRole}
+              `;
+
+
+            if (
+              search &&
+              !searchableText.includes(
+                search
+              )
+            ) {
+
+              return false;
+
+            }
+
+
+            const status =
+              String(
+                entry.status ||
+                ""
+              ).toUpperCase();
+
+
+            if (
+              statusFilter !==
+                "ALL" &&
+              status !==
+                statusFilter
+            ) {
+
+              return false;
+
+            }
+
+
+            if (dateFilter) {
+
+              const date =
+                getEntryDate(entry);
+
+
+              if (!date) {
+                return false;
+              }
+
+
+              const localDate =
+                date.toLocaleDateString(
+                  "en-CA"
+                );
+
+
+              if (
+                localDate !==
+                dateFilter
+              ) {
+
+                return false;
+
+              }
+
+            }
+
+
+            return true;
+
+          }
+        );
+
+
+      updateStats(
+        filtered
+      );
+
+
+      const body =
+        document.getElementById(
+          "historyBody"
+        );
+
+
+      if (
+        !filtered.length
+      ) {
+
+        body.innerHTML = `
+
+          <tr>
+
+            <td colspan="6">
+
+              <div class="empty">
+
+                <i class="bi bi-inbox"></i>
+
+                <strong>
+                  No entry history found
+                </strong>
+
+                <div class="mt-1">
+                  Try changing your search or filters.
+                </div>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        `;
+
+        return;
+
+      }
+
+
+      body.innerHTML =
+        filtered.map(
+          entry => {
+
+            const dateTime =
+              formatDateTime(
+                entry
+              );
+
+
+            const status =
+              String(
+                entry.status ||
+                "UNKNOWN"
+              ).toUpperCase();
+
+
+            const statusClass =
+              status ===
+                "ALLOWED"
+                ? "allowed"
+                : "rejected";
+
+
+            const verifiedBy =
+              entry.verifiedBy ||
+              "-";
+
+
+            const verifiedRole =
+              entry.verifiedByRole ||
+              "-";
+
+
+            const roleClass =
+              getRoleClass(
+                verifiedRole
+              );
+
+
+            const roleIcon =
+              getRoleIcon(
+                verifiedRole
+              );
+
+
+            return `
+
+              <tr>
+
+                <!-- STUDENT -->
+
+                <td>
+
+                  <div class="student-name">
+                    ${escapeHTML(
+                      entry.studentName ||
+                      "Unknown Student"
+                    )}
+                  </div>
+
+                  <div class="student-id">
+                    ${escapeHTML(
+                      entry.studentId ||
+                      "-"
+                    )}
+                  </div>
+
+                </td>
+
+
+                <!-- STUDENT TYPE -->
+
+                <td>
+                  ${escapeHTML(
+                    entry.studentType ||
+                    "-"
+                  )}
+                </td>
+
+
+                <!-- DATE & TIME -->
+
+                <td>
+
+                  <div class="date">
+                    ${escapeHTML(
+                      dateTime.date
+                    )}
+                  </div>
+
+                  <div class="time">
+                    ${escapeHTML(
+                      dateTime.time
+                    )}
+                  </div>
+
+                </td>
+
+
+                <!-- STATUS -->
+
+                <td>
+
+                  <span
+                    class="status ${statusClass}"
+                  >
+
+                    <i class="bi ${
+                      status ===
+                      "ALLOWED"
+
+                        ? "bi-check-circle-fill"
+
+                        : "bi-x-circle-fill"
+                    }"></i>
+
+                    ${escapeHTML(
+                      status
+                    )}
+
+                  </span>
+
+                </td>
+
+
+                <!-- VERIFIED BY -->
+
+                <td>
+
+                  <div class="verified-box">
+
+                    <div class="verified-icon">
+
+                      <i class="bi bi-person-check-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                      <div class="verified-name">
+
+                        ${escapeHTML(
+                          verifiedBy
+                        )}
+
+                      </div>
+
+                      <div class="verified-label">
+                        Verification ID
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+
+                <!-- VERIFIED ROLE -->
+
+                <td>
+
+                  <span
+                    class="role-badge ${roleClass}"
+                  >
+
+                    <i class="bi ${roleIcon}"></i>
+
+                    ${escapeHTML(
+                      verifiedRole
+                    )}
+
+                  </span>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }
+        ).join("");
+
+    }
+
+
+    /* STATS */
+
+    function updateStats(
+      entries
+    ) {
+
+      const total =
+        entries.length;
+
+
+      const allowed =
+        entries.filter(
+          entry =>
+            String(
+              entry.status ||
+              ""
+            ).toUpperCase() ===
+            "ALLOWED"
+        ).length;
+
+
+      const rejected =
+        entries.filter(
+          entry =>
+            String(
+              entry.status ||
+              ""
+            ).toUpperCase() ===
+            "REJECTED"
+        ).length;
+
+
+      const students =
+        new Set(
+          entries
+            .map(
+              entry =>
+                entry.studentId
+            )
+            .filter(Boolean)
+        );
+
+
+      document.getElementById(
+        "totalEntries"
+      ).textContent =
+        total;
+
+
+      document.getElementById(
+        "allowedEntries"
+      ).textContent =
+        allowed;
+
+
+      document.getElementById(
+        "rejectedEntries"
+      ).textContent =
+        rejected;
+
+
+      document.getElementById(
+        "uniqueStudents"
+      ).textContent =
+        students.size;
+
+    }
+
+
+    /* LOGOUT */
+
+    function logout() {
+
+      sessionStorage.removeItem(
+        "entrypass_token"
+      );
+
+      sessionStorage.removeItem(
+        "entrypass_user"
+      );
+
+
+      if (
+        typeof firebase !==
+          "undefined" &&
+        firebase.auth
+      ) {
+
+        firebase.auth()
+          .signOut()
+          .catch(
+            () => {}
+          )
+          .finally(
+            () => {
+
+              window.location.href =
+                "admin-login.html";
+
+            }
+          );
+
+      }
+
+      else {
+
+        window.location.href =
+          "admin-login.html";
+
+      }
+
+    }
+
+
+    /* MOBILE */
+
+    function toggleSidebar() {
+
+      document
+        .getElementById(
+          "sidebar"
+        )
+        .classList.toggle(
+          "show"
+        );
+
+    }
+
+
+    /* FILTER EVENTS */
+
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .addEventListener(
+        "input",
+        renderHistory
+      );
+
+
+    document
+      .getElementById(
+        "dateFilter"
+      )
+      .addEventListener(
+        "change",
+        renderHistory
+      );
+
+
+    document
+      .getElementById(
+        "statusFilter"
+      )
+      .addEventListener(
+        "change",
+        renderHistory
+      );
+
+
+    /* INIT */
+
+    (async function init() {
+
+      const allowed =
+        await checkAccess();
+
+
+      if (!allowed) {
+        return;
+      }
+
+
+      await loadHistory();
+
+    })();
+
+  </script>
 
 </body>
 </html>

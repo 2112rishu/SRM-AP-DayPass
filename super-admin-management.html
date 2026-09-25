@@ -1,0 +1,1953 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Super Admin Control Center | SRM AP EntryPass</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    /* ================= SIDEBAR ================= */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 255px;
+      height: 100vh;
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(99,102,241,.25),
+          transparent 35%
+        ),
+        linear-gradient(
+          180deg,
+          #111827,
+          #172554
+        );
+
+      color: white;
+      padding: 22px 16px;
+      z-index: 1000;
+      transition: .25s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px 28px;
+    }
+
+    .brand-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 14px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6366f1,
+          #06b6d4
+        );
+
+      font-size: 21px;
+      box-shadow:
+        0 8px 25px rgba(99,102,241,.25);
+    }
+
+    .brand h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .brand small {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+
+    .nav-title {
+      color: #64748b;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 800;
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+
+    .nav-link {
+      color: #cbd5e1;
+      padding: 13px 14px;
+      margin: 5px 0;
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      text-decoration: none;
+
+      font-size: 13px;
+      font-weight: 600;
+
+      transition: .2s;
+    }
+
+    .nav-link:hover {
+      color: white;
+      background: rgba(255,255,255,.08);
+    }
+
+    .nav-link.active {
+      color: white;
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(99,102,241,.45),
+          rgba(6,182,212,.18)
+        );
+
+      box-shadow:
+        inset 3px 0 0 #818cf8;
+    }
+
+    .nav-link i {
+      font-size: 17px;
+    }
+
+    .sidebar-bottom {
+      position: absolute;
+      bottom: 18px;
+      left: 16px;
+      right: 16px;
+    }
+
+    /* ================= MAIN ================= */
+
+    .main {
+      margin-left: 255px;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      gap: 20px;
+    }
+
+    .welcome h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .welcome p {
+      margin: 6px 0 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      background: white;
+      border: 1px solid #e5eaf1;
+      padding: 9px 13px;
+      border-radius: 14px;
+
+      box-shadow:
+        0 6px 25px rgba(15,23,42,.05);
+    }
+
+    .profile-avatar {
+      width: 37px;
+      height: 37px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 11px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6366f1,
+          #06b6d4
+        );
+
+      color: white;
+      font-weight: 800;
+    }
+
+    .profile-name {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .profile-role {
+      color: #64748b;
+      font-size: 10px;
+    }
+
+    /* ================= HERO ================= */
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+
+      border-radius: 22px;
+
+      padding: 28px;
+
+      margin-bottom: 22px;
+
+      color: white;
+
+      background:
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(34,211,238,.30),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 20% 100%,
+          rgba(129,140,248,.25),
+          transparent 35%
+        ),
+        linear-gradient(
+          135deg,
+          #111827,
+          #312e81
+        );
+
+      box-shadow:
+        0 15px 45px rgba(30,41,59,.18);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 650px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.14);
+
+      padding: 7px 11px;
+      border-radius: 999px;
+
+      font-size: 10px;
+      font-weight: 800;
+
+      margin-bottom: 13px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .hero-decoration {
+      position: absolute;
+      right: 45px;
+      top: 35px;
+
+      width: 130px;
+      height: 130px;
+
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 35px;
+
+      transform: rotate(18deg);
+    }
+
+    .hero-decoration::after {
+      content: "";
+
+      position: absolute;
+      inset: 20px;
+
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 25px;
+    }
+
+    /* ================= STATS ================= */
+
+    .stats {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 17px;
+
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: white;
+
+      border: 1px solid #e8edf5;
+
+      border-radius: 18px;
+
+      padding: 19px;
+
+      box-shadow:
+        0 7px 28px rgba(15,23,42,.05);
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #eef2ff;
+      color: #4f46e5;
+
+      font-size: 18px;
+    }
+
+    .stat-card h3 {
+      margin: 15px 0 3px;
+
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .stat-card p {
+      margin: 0;
+
+      color: #64748b;
+
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+
+      border-radius: 50%;
+
+      background: #22c55e;
+
+      box-shadow:
+        0 0 0 4px rgba(34,197,94,.12);
+    }
+
+    /* ================= QUICK ACTIONS ================= */
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 13px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .section-title span {
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    .quick-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 15px;
+
+      margin-bottom: 25px;
+    }
+
+    .quick-card {
+      position: relative;
+      overflow: hidden;
+
+      background: white;
+
+      border: 1px solid #e8edf5;
+
+      border-radius: 17px;
+
+      padding: 18px;
+
+      text-decoration: none;
+      color: #172033;
+
+      box-shadow:
+        0 7px 28px rgba(15,23,42,.04);
+
+      transition: .2s;
+    }
+
+    .quick-card:hover {
+      transform: translateY(-3px);
+
+      box-shadow:
+        0 12px 35px rgba(15,23,42,.09);
+    }
+
+    .quick-icon {
+      width: 43px;
+      height: 43px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 12px;
+
+      background: #f1f5f9;
+
+      color: #4f46e5;
+
+      margin-bottom: 13px;
+
+      font-size: 19px;
+    }
+
+    .quick-card h4 {
+      margin: 0;
+
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .quick-card p {
+      margin: 5px 0 0;
+
+      color: #64748b;
+
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .quick-arrow {
+      position: absolute;
+      right: 16px;
+      top: 17px;
+
+      color: #94a3b8;
+    }
+
+    /* ================= LOWER GRID ================= */
+
+    .lower-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1.5fr)
+        minmax(300px, .8fr);
+
+      gap: 18px;
+    }
+
+    .panel {
+      background: white;
+
+      border: 1px solid #e8edf5;
+
+      border-radius: 19px;
+
+      box-shadow:
+        0 8px 30px rgba(15,23,42,.05);
+
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 18px 20px;
+
+      border-bottom: 1px solid #edf1f6;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .panel-header span {
+      color: #64748b;
+      font-size: 10px;
+    }
+
+    /* ================= RECENT ENTRIES ================= */
+
+    .entry-list {
+      padding: 4px 20px 15px;
+    }
+
+    .entry-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 13px 0;
+
+      border-bottom: 1px solid #f0f2f6;
+
+      gap: 15px;
+    }
+
+    .entry-row:last-child {
+      border-bottom: none;
+    }
+
+    .entry-person {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      min-width: 0;
+    }
+
+    .entry-avatar {
+      width: 36px;
+      height: 36px;
+
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 10px;
+
+      background: #eef2ff;
+      color: #4f46e5;
+
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .entry-name {
+      font-size: 12px;
+      font-weight: 700;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .entry-id {
+      color: #94a3b8;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .entry-time {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .entry-time strong {
+      display: block;
+
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .entry-time small {
+      color: #94a3b8;
+      font-size: 9px;
+    }
+
+    .allowed {
+      color: #15803d;
+    }
+
+    .empty-small {
+      text-align: center;
+
+      padding: 35px 15px;
+
+      color: #94a3b8;
+
+      font-size: 12px;
+    }
+
+    /* ================= SYSTEM STATUS ================= */
+
+    .system-body {
+      padding: 18px 20px;
+    }
+
+    .system-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 13px 0;
+
+      border-bottom: 1px solid #f0f2f6;
+    }
+
+    .system-item:last-child {
+      border-bottom: none;
+    }
+
+    .system-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .system-name i {
+      color: #64748b;
+    }
+
+    .online {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      color: #15803d;
+
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    /* ================= MOBILE ================= */
+
+    .mobile-menu {
+      display: none;
+
+      width: 42px;
+      height: 42px;
+
+      border: none;
+      border-radius: 12px;
+
+      background: #111827;
+      color: white;
+    }
+
+    @media(max-width:1100px) {
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+    @media(max-width:768px) {
+
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 20px 15px;
+      }
+
+      .mobile-menu {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .topbar-left {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .welcome h1 {
+        font-size: 22px;
+      }
+
+      .profile-badge {
+        display: none;
+      }
+
+      .hero-decoration {
+        right: -50px;
+      }
+
+    }
+
+    @media(max-width:520px) {
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .hero h2 {
+        font-size: 22px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ================= SIDEBAR ================= -->
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+
+      <div class="brand-icon">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+
+      <div>
+        <h4>EntryPass</h4>
+        <small>Super Admin</small>
+      </div>
+
+    </div>
+
+
+    <div class="nav-title">
+      Control
+    </div>
+
+
+    <a
+      href="super-admin-management.html"
+      class="nav-link active"
+    >
+      <i class="bi bi-grid-1x2-fill"></i>
+      Control Center
+    </a>
+
+
+    <a
+      href="admin-management.html"
+      class="nav-link"
+    >
+      <i class="bi bi-people-fill"></i>
+      User Management
+    </a>
+
+
+    <div class="nav-title">
+      Monitoring
+    </div>
+
+
+    <a
+      href="admin.html"
+      class="nav-link"
+    >
+      <i class="bi bi-journal-check"></i>
+      Entry Records
+    </a>
+
+
+    <a
+      href="history.html"
+      class="nav-link"
+    >
+      <i class="bi bi-clock-history"></i>
+      Complete History
+    </a>
+
+
+    <a
+      href="security.html"
+      class="nav-link"
+    >
+      <i class="bi bi-qr-code-scan"></i>
+      QR Scanner
+    </a>
+
+
+    <div class="sidebar-bottom">
+
+      <button
+        onclick="logout()"
+        class="nav-link w-100 border-0"
+        style="background:transparent;"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        Logout
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main class="main">
+
+    <div class="topbar">
+
+      <div class="topbar-left">
+
+        <button
+          class="mobile-menu"
+          onclick="toggleSidebar()"
+        >
+          <i class="bi bi-list"></i>
+        </button>
+
+
+        <div class="welcome">
+
+          <h1 id="welcomeTitle">
+            Super Admin Control Center
+          </h1>
+
+          <p>
+            Manage users, monitor entries and control the SRM AP EntryPass system.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="profile-badge">
+
+        <div
+          class="profile-avatar"
+          id="profileAvatar"
+        >
+          SA
+        </div>
+
+        <div>
+
+          <div
+            class="profile-name"
+            id="profileName"
+          >
+            Super Admin
+          </div>
+
+          <div class="profile-role">
+            SUPER_ADMIN
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="hero-badge">
+          <i class="bi bi-shield-check"></i>
+          SYSTEM CONTROL
+        </div>
+
+        <h2>
+          Everything under your control.
+        </h2>
+
+        <p>
+          Manage campus users, monitor day-pass activity,
+          verify QR entries and review the complete history
+          from one secure control center.
+        </p>
+
+      </div>
+
+
+      <div class="hero-decoration"></div>
+
+    </section>
+
+
+    <!-- ================= STATS ================= -->
+
+    <section class="stats">
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+
+          <div class="status-dot"></div>
+
+        </div>
+
+        <h3 id="totalUsers">
+          0
+        </h3>
+
+        <p>
+          Total Users
+        </p>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            <i class="bi bi-person-badge-fill"></i>
+          </div>
+
+          <div class="status-dot"></div>
+
+        </div>
+
+        <h3 id="activeUsers">
+          0
+        </h3>
+
+        <p>
+          Active Accounts
+        </p>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            <i class="bi bi-journal-check"></i>
+          </div>
+
+          <div class="status-dot"></div>
+
+        </div>
+
+        <h3 id="totalEntries">
+          0
+        </h3>
+
+        <p>
+          Total Entries
+        </p>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+
+          <div class="status-dot"></div>
+
+        </div>
+
+        <h3 id="todayEntries">
+          0
+        </h3>
+
+        <p>
+          Today's Entries
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= QUICK ACTIONS ================= -->
+
+    <div class="section-title">
+
+      <h3>
+        Quick Operations
+      </h3>
+
+      <span>
+        Super Admin access
+      </span>
+
+    </div>
+
+
+    <section class="quick-grid">
+
+      <a
+        href="admin-management.html"
+        class="quick-card"
+      >
+
+        <i class="bi bi-arrow-up-right quick-arrow"></i>
+
+        <div class="quick-icon">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+
+        <h4>
+          User Management
+        </h4>
+
+        <p>
+          Create, activate, block and manage campus accounts.
+        </p>
+
+      </a>
+
+
+      <a
+        href="admin.html"
+        class="quick-card"
+      >
+
+        <i class="bi bi-arrow-up-right quick-arrow"></i>
+
+        <div class="quick-icon">
+          <i class="bi bi-journal-text"></i>
+        </div>
+
+        <h4>
+          Entry Records
+        </h4>
+
+        <p>
+          View and monitor all day-pass entry records.
+        </p>
+
+      </a>
+
+
+      <a
+        href="history.html"
+        class="quick-card"
+      >
+
+        <i class="bi bi-arrow-up-right quick-arrow"></i>
+
+        <div class="quick-icon">
+          <i class="bi bi-clock-history"></i>
+        </div>
+
+        <h4>
+          Complete History
+        </h4>
+
+        <p>
+          Review the complete history of campus entries.
+        </p>
+
+      </a>
+
+
+      <a
+        href="security.html"
+        class="quick-card"
+      >
+
+        <i class="bi bi-arrow-up-right quick-arrow"></i>
+
+        <div class="quick-icon">
+          <i class="bi bi-qr-code-scan"></i>
+        </div>
+
+        <h4>
+          QR Scanner
+        </h4>
+
+        <p>
+          Scan and securely verify student day passes.
+        </p>
+
+      </a>
+
+    </section>
+
+
+    <!-- ================= LOWER ================= -->
+
+    <section class="lower-grid">
+
+
+      <!-- RECENT ENTRIES -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <h3>
+            <i class="bi bi-activity me-2"></i>
+            Recent Entries
+          </h3>
+
+          <span>
+            Latest activity
+          </span>
+
+        </div>
+
+
+        <div
+          class="entry-list"
+          id="recentEntries"
+        >
+
+          <div class="empty-small">
+            Loading recent entries...
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- SYSTEM STATUS -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <h3>
+            <i class="bi bi-heart-pulse me-2"></i>
+            System Status
+          </h3>
+
+          <span>
+            Live
+          </span>
+
+        </div>
+
+
+        <div class="system-body">
+
+
+          <div class="system-item">
+
+            <div class="system-name">
+              <i class="bi bi-server"></i>
+              Backend Server
+            </div>
+
+            <div class="online">
+              <span class="status-dot"></span>
+              Online
+            </div>
+
+          </div>
+
+
+          <div class="system-item">
+
+            <div class="system-name">
+              <i class="bi bi-database"></i>
+              Firestore
+            </div>
+
+            <div class="online">
+              <span class="status-dot"></span>
+              Connected
+            </div>
+
+          </div>
+
+
+          <div class="system-item">
+
+            <div class="system-name">
+              <i class="bi bi-shield-check"></i>
+              Authentication
+            </div>
+
+            <div class="online">
+              <span class="status-dot"></span>
+              Active
+            </div>
+
+          </div>
+
+
+          <div class="system-item">
+
+            <div class="system-name">
+              <i class="bi bi-qr-code"></i>
+              QR Verification
+            </div>
+
+            <div class="online">
+              <span class="status-dot"></span>
+              Active
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= FIREBASE ================= -->
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+
+
+  <script>
+
+    let currentUser = null;
+
+
+    /* ================= TOKEN ================= */
+
+    function getToken() {
+
+      return sessionStorage.getItem(
+        "entrypass_token"
+      );
+
+    }
+
+
+    /* ================= ESCAPE ================= */
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* ================= API ================= */
+
+    async function apiFetch(
+      url,
+      options = {}
+    ) {
+
+      const token = getToken();
+
+      if (!token) {
+        throw new Error(
+          "Authentication required."
+        );
+      }
+
+
+      const headers = {
+
+        ...(options.headers || {}),
+
+        Authorization:
+          `Bearer ${token}`,
+
+        "Content-Type":
+          "application/json"
+
+      };
+
+
+      const response =
+        await fetch(
+          url,
+          {
+            ...options,
+            headers
+          }
+        );
+
+
+      const data =
+        await response
+          .json()
+          .catch(() => ({}));
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Request failed."
+        );
+
+      }
+
+
+      return data;
+
+    }
+
+
+    /* ================= ACCESS ================= */
+
+    async function checkAccess() {
+
+      try {
+
+        const data =
+          await apiFetch(
+            "/api/me"
+          );
+
+
+        currentUser =
+          data.user || data;
+
+
+        const role =
+          String(
+            currentUser.role || ""
+          ).toUpperCase();
+
+
+        if (role !== "SUPER_ADMIN") {
+
+          alert(
+            "Access denied. Super Admin access required."
+          );
+
+          window.location.href =
+            "admin-login.html";
+
+          return false;
+
+        }
+
+
+        updateProfile();
+
+        return true;
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        sessionStorage.clear();
+
+        window.location.href =
+          "admin-login.html";
+
+        return false;
+
+      }
+
+    }
+
+
+    /* ================= PROFILE ================= */
+
+    function updateProfile() {
+
+      const name =
+        currentUser.name ||
+        "Super Admin";
+
+
+      document.getElementById(
+        "profileName"
+      ).textContent = name;
+
+
+      const initials =
+        name
+          .split(" ")
+          .map(word => word[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+
+
+      document.getElementById(
+        "profileAvatar"
+      ).textContent =
+        initials || "SA";
+
+
+      document.getElementById(
+        "welcomeTitle"
+      ).textContent =
+        `Welcome, ${name}`;
+
+    }
+
+
+    /* ================= USERS ================= */
+
+    async function loadUsers() {
+
+      try {
+
+        const data =
+          await apiFetch(
+            "/api/admin/users"
+          );
+
+
+        const users =
+          Array.isArray(data.users)
+            ? data.users
+            : [];
+
+
+        document.getElementById(
+          "totalUsers"
+        ).textContent =
+          users.length;
+
+
+        const active =
+          users.filter(user => {
+
+            const status =
+              String(
+                user.accountStatus ||
+                user.status ||
+                "ACTIVE"
+              ).toUpperCase();
+
+
+            return status === "ACTIVE";
+
+          }).length;
+
+
+        document.getElementById(
+          "activeUsers"
+        ).textContent =
+          active;
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "User loading error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ================= ENTRIES ================= */
+
+    async function loadEntries() {
+
+      try {
+
+        const data =
+          await apiFetch(
+            "/api/admin/entries"
+          );
+
+
+        const entries =
+          Array.isArray(data.entries)
+            ? data.entries
+            : [];
+
+
+        document.getElementById(
+          "totalEntries"
+        ).textContent =
+          entries.length;
+
+
+        const today =
+          new Date()
+            .toLocaleDateString(
+              "en-CA"
+            );
+
+
+        const todayCount =
+          entries.filter(entry => {
+
+            const date =
+              getEntryDate(entry);
+
+
+            if (!date) {
+              return false;
+            }
+
+
+            return date
+              .toLocaleDateString(
+                "en-CA"
+              ) === today;
+
+          }).length;
+
+
+        document.getElementById(
+          "todayEntries"
+        ).textContent =
+          todayCount;
+
+
+        renderRecentEntries(
+          entries
+        );
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Entry loading error:",
+          error
+        );
+
+
+        document.getElementById(
+          "recentEntries"
+        ).innerHTML = `
+          <div class="empty-small">
+            Unable to load recent entries.
+          </div>
+        `;
+
+      }
+
+    }
+
+
+    /* ================= DATE ================= */
+
+    function getEntryDate(entry) {
+
+      if (entry.createdAt) {
+
+        if (
+          typeof entry.createdAt ===
+          "string"
+        ) {
+
+          const date =
+            new Date(
+              entry.createdAt
+            );
+
+
+          if (!Number.isNaN(
+            date.getTime()
+          )) {
+            return date;
+          }
+
+        }
+
+
+        if (
+          entry.createdAt._seconds
+        ) {
+
+          return new Date(
+            entry.createdAt._seconds *
+            1000
+          );
+
+        }
+
+      }
+
+
+      if (entry.timestamp) {
+
+        const date =
+          new Date(
+            entry.timestamp
+          );
+
+
+        if (!Number.isNaN(
+          date.getTime()
+        )) {
+          return date;
+        }
+
+      }
+
+
+      return null;
+
+    }
+
+
+    /* ================= RECENT ================= */
+
+    function renderRecentEntries(
+      entries
+    ) {
+
+      const container =
+        document.getElementById(
+          "recentEntries"
+        );
+
+
+      if (!entries.length) {
+
+        container.innerHTML = `
+          <div class="empty-small">
+            No entry activity yet.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      const sorted =
+        [...entries]
+          .sort((a, b) => {
+
+            const dateA =
+              getEntryDate(a);
+
+            const dateB =
+              getEntryDate(b);
+
+
+            return (
+              (dateB?.getTime() || 0) -
+              (dateA?.getTime() || 0)
+            );
+
+          })
+          .slice(0, 6);
+
+
+      container.innerHTML =
+        sorted.map(entry => {
+
+          const date =
+            getEntryDate(entry);
+
+
+          const dateText =
+            date
+              ? date.toLocaleDateString(
+                  "en-IN",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                  }
+                )
+              : "-";
+
+
+          const timeText =
+            date
+              ? date.toLocaleTimeString(
+                  "en-IN",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  }
+                )
+              : "-";
+
+
+          const name =
+            entry.studentName ||
+            "Unknown Student";
+
+
+          const initials =
+            name
+              .split(" ")
+              .map(word => word[0])
+              .join("")
+              .substring(0, 2)
+              .toUpperCase();
+
+
+          const status =
+            String(
+              entry.status ||
+              ""
+            ).toUpperCase();
+
+
+          return `
+
+            <div class="entry-row">
+
+              <div class="entry-person">
+
+                <div class="entry-avatar">
+                  ${escapeHTML(
+                    initials || "ST"
+                  )}
+                </div>
+
+                <div>
+
+                  <div class="entry-name">
+                    ${escapeHTML(name)}
+                  </div>
+
+                  <div class="entry-id">
+                    ${escapeHTML(
+                      entry.studentId || "-"
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="entry-time">
+
+                <strong
+                  class="${
+                    status === "ALLOWED"
+                      ? "allowed"
+                      : ""
+                  }"
+                >
+                  ${
+                    status === "ALLOWED"
+                      ? "Entry Allowed"
+                      : escapeHTML(
+                          status || "Entry"
+                        )
+                  }
+                </strong>
+
+                <small>
+                  ${escapeHTML(
+                    dateText
+                  )}
+                  •
+                  ${escapeHTML(
+                    timeText
+                  )}
+                </small>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }).join("");
+
+    }
+
+
+    /* ================= LOGOUT ================= */
+
+    function logout() {
+
+      sessionStorage.removeItem(
+        "entrypass_token"
+      );
+
+      sessionStorage.removeItem(
+        "entrypass_user"
+      );
+
+
+      if (
+        typeof firebase !==
+          "undefined" &&
+        firebase.auth
+      ) {
+
+        firebase.auth()
+          .signOut()
+          .catch(() => {})
+          .finally(() => {
+
+            window.location.href =
+              "admin-login.html";
+
+          });
+
+      }
+
+      else {
+
+        window.location.href =
+          "admin-login.html";
+
+      }
+
+    }
+
+
+    /* ================= MOBILE ================= */
+
+    function toggleSidebar() {
+
+      document
+        .getElementById(
+          "sidebar"
+        )
+        .classList.toggle(
+          "show"
+        );
+
+    }
+
+
+    /* ================= INIT ================= */
+
+    (async function init() {
+
+      const allowed =
+        await checkAccess();
+
+
+      if (!allowed) {
+        return;
+      }
+
+
+      await Promise.all([
+        loadUsers(),
+        loadEntries()
+      ]);
+
+    })();
+
+  </script>
+
+</body>
+</html>

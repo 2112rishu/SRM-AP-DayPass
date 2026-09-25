@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Admin Dashboard | SRM AP EntryPass</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --primary: #5b4bff;
+      --primary-dark: #4338ca;
+      --secondary: #8b5cf6;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --red: #ef4444;
+      --orange: #f59e0b;
+
+      --text: #172033;
+      --muted: #7a8499;
+      --border: #e9ecf3;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+
+      --sidebar-width: 255px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(124, 92, 246, .35), transparent 28%),
+        linear-gradient(160deg, #11152d 0%, #171b38 45%, #101426 100%);
+      color: white;
+      z-index: 1000;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 12px 0 35px rgba(22, 25, 55, .08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 9px 28px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #7466ff, #9b6cff);
+      box-shadow: 0 10px 25px rgba(111, 91, 255, .35);
+      font-size: 21px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+    }
+
+    .brand-subtitle {
+      color: rgba(255,255,255,.48);
+      font-size: 10px;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+    }
+
+    .nav-label {
+      color: rgba(255,255,255,.35);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      padding: 8px 12px;
+      margin-top: 5px;
+    }
+
+    .nav-item-custom {
+      text-decoration: none;
+      color: rgba(255,255,255,.68);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 13px;
+      margin: 4px 0;
+      border-radius: 13px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .25s ease;
+    }
+
+    .nav-item-custom i {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .nav-item-custom:hover {
+      color: white;
+      background: rgba(255,255,255,.07);
+      transform: translateX(3px);
+    }
+
+    .nav-item-custom.active {
+      color: white;
+      background: linear-gradient(
+        100deg,
+        rgba(103, 88, 255, .95),
+        rgba(126, 78, 234, .75)
+      );
+      box-shadow:
+        0 12px 25px rgba(88, 75, 255, .23),
+        inset 0 1px rgba(255,255,255,.18);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+    }
+
+    .campus-status {
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045);
+      border-radius: 15px;
+      margin: 10px 4px 15px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 0 5px rgba(34,197,94,.10);
+      margin-right: 8px;
+    }
+
+    .campus-status strong {
+      font-size: 12px;
+    }
+
+    .campus-status small {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255,255,255,.4);
+      font-size: 10px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      border: 0;
+      background: rgba(239,68,68,.08);
+      color: #ff9a9a;
+      border-radius: 12px;
+      padding: 11px;
+      font-weight: 600;
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239,68,68,.16);
+      color: #ffb2b2;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      padding: 28px 34px 45px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .breadcrumb-text {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .page-title {
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -.8px;
+      margin: 0;
+    }
+
+    .page-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 9px 7px 7px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      box-shadow: 0 6px 22px rgba(31, 41, 55, .04);
+    }
+
+    .admin-avatar {
+      width: 37px;
+      height: 37px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      background: linear-gradient(135deg, #5b4bff, #8b5cf6);
+    }
+
+    .admin-name {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .admin-role {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 205px;
+      border-radius: 25px;
+      padding: 30px 34px;
+      color: white;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.18), transparent 24%),
+        radial-gradient(circle at 65% 110%, rgba(6,182,212,.35), transparent 28%),
+        linear-gradient(115deg, #4035c9, #6549e8 48%, #7649d9);
+      box-shadow: 0 22px 45px rgba(73, 59, 205, .18);
+      margin-bottom: 22px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 50%;
+      right: -65px;
+      top: -90px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 50%;
+      right: 25px;
+      top: -50px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 30px;
+      padding: 6px 11px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 15px;
+    }
+
+    .hero h2 {
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      line-height: 1.7;
+      margin: 0;
+      max-width: 570px;
+    }
+
+    .hero-orbit {
+      position: absolute;
+      right: 75px;
+      bottom: 22px;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .hero-orbit::before {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.13);
+    }
+
+    .hero-orbit i {
+      position: absolute;
+      right: 9px;
+      top: 17px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 20px rgba(255,255,255,.9);
+    }
+
+    /* =========================
+       QUICK STRIP
+    ========================= */
+
+    .glance {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 13px;
+      margin-bottom: 22px;
+    }
+
+    .glance-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 16px 17px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      box-shadow: 0 8px 24px rgba(24, 32, 56, .035);
+    }
+
+    .glance-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: #f1efff;
+      color: var(--primary);
+      font-size: 16px;
+    }
+
+    .glance-card:nth-child(2) .glance-icon {
+      background: #eafbf5;
+      color: var(--green);
+    }
+
+    .glance-card:nth-child(3) .glance-icon {
+      background: #edf9fc;
+      color: var(--cyan);
+    }
+
+    .glance-card:nth-child(4) .glance-icon {
+      background: #fff6e7;
+      color: var(--orange);
+    }
+
+    .glance-label {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .glance-value {
+      font-size: 17px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 26px 0 13px;
+    }
+
+    .section-title h3 {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .section-title span {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      padding: 19px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(24, 32, 56, .035);
+      transition: .25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(24, 32, 56, .08);
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .purple {
+      color: #6456ed;
+      background: #f0eeff;
+    }
+
+    .green {
+      color: #079b6d;
+      background: #eafaf4;
+    }
+
+    .orange {
+      color: #d98b00;
+      background: #fff6e6;
+    }
+
+    .red {
+      color: #e54848;
+      background: #fff0f0;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -1px;
+      margin-top: 14px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .stat-bar {
+      height: 4px;
+      background: #edf0f6;
+      border-radius: 10px;
+      margin-top: 17px;
+      overflow: hidden;
+    }
+
+    .stat-bar span {
+      display: block;
+      height: 100%;
+      border-radius: 10px;
+      width: 70%;
+      background: linear-gradient(90deg, #6556ed, #8d76ff);
+    }
+
+    .stat-card:nth-child(2) .stat-bar span {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      width: 88%;
+    }
+
+    .stat-card:nth-child(3) .stat-bar span {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      width: 48%;
+    }
+
+    .stat-card:nth-child(4) .stat-bar span {
+      background: linear-gradient(90deg, #ef4444, #fb7185);
+      width: 17%;
+    }
+
+    /* =========================
+       CONTENT GRID
+    ========================= */
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(270px, .8fr);
+      gap: 17px;
+      margin-top: 17px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(24, 32, 56, .035);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 19px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f0f2f7;
+    }
+
+    .panel-header h4 {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .panel-header small {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .search-box {
+      padding: 13px 15px;
+      border-bottom: 1px solid #f0f2f7;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap i {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1px solid #e7eaf1;
+      background: #f8f9fc;
+      border-radius: 11px;
+      padding: 9px 12px 9px 35px;
+      outline: none;
+      font-size: 11px;
+      transition: .2s;
+    }
+
+    .search-input:focus {
+      border-color: #aaa2ff;
+      box-shadow: 0 0 0 3px rgba(91,75,255,.08);
+      background: white;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      padding: 12px 16px;
+      color: #9299aa;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+      background: #fbfcfe;
+    }
+
+    td {
+      padding: 13px 16px;
+      border-top: 1px solid #f0f2f7;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      transition: .15s;
+    }
+
+    tbody tr:hover {
+      background: #fafaff;
+    }
+
+    .student-cell {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .student-avatar {
+      width: 29px;
+      height: 29px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: #efedff;
+      color: #6153df;
+      font-weight: 800;
+      font-size: 10px;
+    }
+
+    .student-name {
+      font-weight: 700;
+      color: #283044;
+    }
+
+    .student-id {
+      color: #9ba2b1;
+      font-size: 9px;
+      margin-top: 2px;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 30px;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .badge-status.allowed {
+      color: #087a57;
+      background: #eafaf4;
+    }
+
+    .badge-status.rejected {
+      color: #c83232;
+      background: #fff0f0;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .empty-state i {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 9px;
+      color: #c6cad5;
+    }
+
+    /* =========================
+       QUICK ACTIONS
+    ========================= */
+
+    .action-list {
+      padding: 10px;
+    }
+
+    .action-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      padding: 13px;
+      border-radius: 14px;
+      transition: .2s;
+      margin-bottom: 5px;
+    }
+
+    .action-card:hover {
+      background: #f7f7ff;
+      transform: translateX(3px);
+    }
+
+    .action-icon {
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      color: white;
+    }
+
+    .action-purple {
+      background: linear-gradient(135deg, #635bff, #8177ff);
+    }
+
+    .action-cyan {
+      background: linear-gradient(135deg, #06a8c7, #22c7e4);
+    }
+
+    .action-green {
+      background: linear-gradient(135deg, #0fa979, #26c997);
+    }
+
+    .action-title {
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .action-description {
+      color: var(--muted);
+      font-size: 9px;
+      margin-top: 3px;
+    }
+
+    .action-arrow {
+      margin-left: auto;
+      color: #b2b7c3;
+      font-size: 12px;
+    }
+
+    /* =========================
+       SYSTEM CARD
+    ========================= */
+
+    .system-card {
+      margin: 5px 10px 15px;
+      border-radius: 15px;
+      padding: 15px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(91,75,255,.12), transparent 35%),
+        #f7f7fc;
+      border: 1px solid #ededf5;
+    }
+
+    .system-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .system-title strong {
+      font-size: 11px;
+    }
+
+    .online-pill {
+      color: #07835d;
+      background: #e5f8f0;
+      border-radius: 20px;
+      padding: 4px 7px;
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .system-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 9px;
+    }
+
+    .system-row strong {
+      color: #394154;
+      font-size: 9px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 1100px) {
+      .stats-grid,
+      .glance {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-orbit {
+        right: 30px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      :root {
+        --sidebar-width: 0px;
+      }
+
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: auto;
+      }
+
+      .brand {
+        padding-bottom: 15px;
+      }
+
+      .nav-label,
+      .campus-status {
+        display: none;
+      }
+
+      .sidebar nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .nav-item-custom {
+        flex: 1;
+        min-width: 145px;
+      }
+
+      .sidebar-bottom {
+        margin-top: 12px;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 20px 15px 35px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+      }
+
+      .hero {
+        padding: 25px;
+      }
+
+      .hero h2 {
+        font-size: 23px;
+      }
+
+      .hero-orbit {
+        opacity: .35;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .stats-grid,
+      .glance {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-profile {
+        width: 100%;
+      }
+
+      .hero {
+        min-height: 220px;
+      }
+
+      .hero-orbit {
+        right: -25px;
+        bottom: -10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       SIDEBAR
+  ========================== -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-logo">
+        <i class="bi bi-shield-check"></i>
+      </div>
+
+      <div>
+        <div class="brand-title">EntryPass</div>
+        <div class="brand-subtitle">SRM AP Campus</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+
+    <nav>
+      <a href="admin-dashboard.html"
+         class="nav-item-custom active">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="admin-management.html"
+         class="nav-item-custom">
+        <i class="bi bi-people-fill"></i>
+        <span>User Management</span>
+      </a>
+
+      <a href="admin.html"
+         class="nav-item-custom">
+        <i class="bi bi-ticket-perforated-fill"></i>
+        <span>Entry Records</span>
+      </a>
+
+      <a href="index.html"
+         class="nav-item-custom">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Home</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <div class="campus-status">
+        <div>
+          <span class="status-dot"></span>
+          <strong>Campus System Online</strong>
+        </div>
+
+        <small>
+          EntryPass services are operating normally.
+        </small>
+      </div>
+
+      <button class="logout-btn" id="logoutBtn">
+        <i class="bi bi-box-arrow-right me-2"></i>
+        Sign Out
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =========================
+       MAIN
+  ========================== -->
+
+  <main class="main">
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+      <div>
+        <div class="breadcrumb-text">
+          EntryPass / Administration
+        </div>
+
+        <h1 class="page-title">
+          Admin Command Center
+        </h1>
+
+        <div class="page-subtitle">
+          Manage campus access, users and entry activity from one place.
+        </div>
+      </div>
+
+      <div class="admin-profile">
+
+        <div class="admin-avatar" id="adminAvatar">
+          A
+        </div>
+
+        <div>
+          <div class="admin-name" id="adminName">
+            Administrator
+          </div>
+
+          <div class="admin-role" id="adminRole">
+            ADMIN
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="hero-tag">
+          <i class="bi bi-stars"></i>
+          CAMPUS ACCESS CONTROL
+        </div>
+
+        <h2>
+          Welcome to your command center.
+        </h2>
+
+        <p>
+          Monitor EntryPass activity, manage campus users and keep
+          student access operations organized through a single
+          secure administration portal.
+        </p>
+
+      </div>
+
+      <div class="hero-orbit">
+        <i></i>
+      </div>
+
+    </section>
+
+
+    <!-- TODAY AT A GLANCE -->
+
+    <div class="glance">
+
+      <div class="glance-card">
+        <div class="glance-icon">
+          <i class="bi bi-calendar3"></i>
+        </div>
+
+        <div>
+          <div class="glance-label">Today</div>
+          <div class="glance-value" id="todayDate">--</div>
+        </div>
+      </div>
+
+
+      <div class="glance-card">
+        <div class="glance-icon">
+          <i class="bi bi-activity"></i>
+        </div>
+
+        <div>
+          <div class="glance-label">System</div>
+          <div class="glance-value">Operational</div>
+        </div>
+      </div>
+
+
+      <div class="glance-card">
+        <div class="glance-icon">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+
+        <div>
+          <div class="glance-label">Security</div>
+          <div class="glance-value">Protected</div>
+        </div>
+      </div>
+
+
+      <div class="glance-card">
+        <div class="glance-icon">
+          <i class="bi bi-person-check"></i>
+        </div>
+
+        <div>
+          <div class="glance-label">Access</div>
+          <div class="glance-value">Controlled</div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- STATISTICS -->
+
+    <div class="section-title">
+      <h3>Campus overview</h3>
+      <span>Live data from EntryPass</span>
+    </div>
+
+    <section class="stats-grid">
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Registered users</div>
+          </div>
+
+          <div class="stat-icon purple">
+            <i class="bi bi-people-fill"></i>
+          </div>
+        </div>
+
+        <div class="stat-number" id="totalUsers">
+          0
+        </div>
+
+        <div class="stat-label">
+          Students and staff
+        </div>
+
+        <div class="stat-bar">
+          <span></span>
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Total entries</div>
+          </div>
+
+          <div class="stat-icon green">
+            <i class="bi bi-door-open-fill"></i>
+          </div>
+        </div>
+
+        <div class="stat-number" id="totalEntries">
+          0
+        </div>
+
+        <div class="stat-label">
+          Recorded access events
+        </div>
+
+        <div class="stat-bar">
+          <span></span>
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Allowed entries</div>
+          </div>
+
+          <div class="stat-icon orange">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+        </div>
+
+        <div class="stat-number" id="allowedEntries">
+          0
+        </div>
+
+        <div class="stat-label">
+          Successfully verified
+        </div>
+
+        <div class="stat-bar">
+          <span></span>
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+          <div>
+            <div class="stat-label">Rejected entries</div>
+          </div>
+
+          <div class="stat-icon red">
+            <i class="bi bi-x-circle-fill"></i>
+          </div>
+        </div>
+
+        <div class="stat-number" id="rejectedEntries">
+          0
+        </div>
+
+        <div class="stat-label">
+          Access denied
+        </div>
+
+        <div class="stat-bar">
+          <span></span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- MAIN CONTENT -->
+
+    <section class="content-grid">
+
+      <!-- RECENT ENTRIES -->
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <h4>Recent entry activity</h4>
+            <small>Latest campus access records</small>
+          </div>
+
+          <i class="bi bi-three-dots"
+             style="color:#9ca3af;">
+          </i>
+
+        </div>
+
+        <div class="search-box">
+
+          <div class="search-wrap">
+
+            <i class="bi bi-search"></i>
+
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search student, ID, status or verifier..."
+            />
+
+          </div>
+
+        </div>
+
+        <div class="table-container">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Status</th>
+                <th>Verified By</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="entriesTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <!-- RIGHT SIDE -->
+
+      <div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <div>
+              <h4>Quick operations</h4>
+              <small>Frequently used tools</small>
+            </div>
+
+          </div>
+
+          <div class="action-list">
+
+            <a
+              href="admin-management.html"
+              class="action-card"
+            >
+
+              <div class="action-icon action-purple">
+                <i class="bi bi-person-gear"></i>
+              </div>
+
+              <div>
+                <div class="action-title">
+                  Manage Users
+                </div>
+
+                <div class="action-description">
+                  Create, block or activate accounts
+                </div>
+              </div>
+
+              <i class="bi bi-chevron-right action-arrow"></i>
+
+            </a>
+
+
+            <a
+              href="admin.html"
+              class="action-card"
+            >
+
+              <div class="action-icon action-cyan">
+                <i class="bi bi-ticket-detailed"></i>
+              </div>
+
+              <div>
+                <div class="action-title">
+                  Entry Records
+                </div>
+
+                <div class="action-description">
+                  View campus access activity
+                </div>
+              </div>
+
+              <i class="bi bi-chevron-right action-arrow"></i>
+
+            </a>
+
+
+            <a
+              href="index.html"
+              class="action-card"
+            >
+
+              <div class="action-icon action-green">
+                <i class="bi bi-globe2"></i>
+              </div>
+
+              <div>
+                <div class="action-title">
+                  Open EntryPass
+                </div>
+
+                <div class="action-description">
+                  Return to the main portal
+                </div>
+              </div>
+
+              <i class="bi bi-chevron-right action-arrow"></i>
+
+            </a>
+
+          </div>
+
+
+          <!-- SYSTEM STATUS -->
+
+          <div class="system-card">
+
+            <div class="system-title">
+
+              <strong>
+                <i class="bi bi-cpu me-1"></i>
+                System status
+              </strong>
+
+              <span class="online-pill">
+                ● ONLINE
+              </span>
+
+            </div>
+
+            <div class="system-row">
+              <span>Authentication</span>
+              <strong>Protected</strong>
+            </div>
+
+            <div class="system-row">
+              <span>Database</span>
+              <strong>Connected</strong>
+            </div>
+
+            <div class="system-row">
+              <span>QR verification</span>
+              <strong>Active</strong>
+            </div>
+
+            <div class="system-row">
+              <span>Access control</span>
+              <strong>Enabled</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+    const token = sessionStorage.getItem("entrypass_token");
+    const savedUser = sessionStorage.getItem("entrypass_user");
+
+    let currentUser = null;
+    let allEntries = [];
+
+    /* =========================
+       HELPERS
+    ========================== */
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getInitials(name) {
+      const value = String(name || "Admin").trim();
+
+      if (!value) return "A";
+
+      return value
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(word => word.charAt(0))
+        .join("")
+        .toUpperCase();
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+
+      try {
+        let date;
+
+        if (
+          typeof value === "object" &&
+          value.seconds
+        ) {
+          date = new Date(value.seconds * 1000);
+        } else {
+          date = new Date(value);
+        }
+
+        if (Number.isNaN(date.getTime())) {
+          return "-";
+        }
+
+        return date.toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+      } catch {
+        return "-";
+      }
+    }
+
+    function getTimestamp(entry) {
+      const value =
+        entry.createdAt ||
+        entry.timestamp ||
+        entry.date;
+
+      if (!value) return 0;
+
+      if (
+        typeof value === "object" &&
+        value.seconds
+      ) {
+        return Number(value.seconds) * 1000;
+      }
+
+      const parsed = new Date(value).getTime();
+
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    /* =========================
+       API
+    ========================== */
+
+    async function api(url, options = {}) {
+
+      const headers = {
+        ...(options.headers || {})
+      };
+
+      if (token) {
+        headers.Authorization = "Bearer " + token;
+      }
+
+      if (
+        options.body &&
+        !headers["Content-Type"]
+      ) {
+        headers["Content-Type"] =
+          "application/json";
+      }
+
+      const response = await fetch(url, {
+        ...options,
+        headers
+      });
+
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          data.message ||
+          "Request failed."
+        );
+      }
+
+      return data;
+    }
+
+    /* =========================
+       AUTH
+    ========================== */
+
+    async function loadProfile() {
+
+      if (!token) {
+        window.location.href = "admin-login.html";
+        return;
+      }
+
+      try {
+
+        const data = await api("/api/me");
+
+        currentUser = data.user || data;
+
+        const role =
+          String(currentUser.role || "")
+            .toUpperCase();
+
+        if (
+          role !== "ADMIN" &&
+          role !== "SUPER_ADMIN"
+        ) {
+          alert("Access denied.");
+          window.location.href =
+            "admin-login.html";
+          return;
+        }
+
+        const name =
+          currentUser.name ||
+          currentUser.email ||
+          "Administrator";
+
+        document.getElementById(
+          "adminName"
+        ).textContent = name;
+
+        document.getElementById(
+          "adminRole"
+        ).textContent = role;
+
+        document.getElementById(
+          "adminAvatar"
+        ).textContent =
+          getInitials(name);
+
+      } catch (error) {
+
+        console.error(error);
+
+        sessionStorage.clear();
+
+        window.location.href =
+          "admin-login.html";
+      }
+    }
+
+    /* =========================
+       LOAD USERS
+    ========================== */
+
+    async function loadUsers() {
+
+      const data =
+        await api("/api/admin/users");
+
+      const users =
+        Array.isArray(data.users)
+          ? data.users
+          : [];
+
+      document.getElementById(
+        "totalUsers"
+      ).textContent = users.length;
+    }
+
+    /* =========================
+       LOAD ENTRIES
+    ========================== */
+
+    async function loadEntries() {
+
+      const data =
+        await api("/api/admin/entries");
+
+      allEntries =
+        Array.isArray(data.entries)
+          ? data.entries
+          : [];
+
+      updateStats();
+      renderEntries(allEntries);
+    }
+
+    /* =========================
+       STATISTICS
+    ========================== */
+
+    function updateStats() {
+
+      const total =
+        allEntries.length;
+
+      const allowed =
+        allEntries.filter(entry =>
+          String(entry.status || "")
+            .toUpperCase() === "ALLOWED"
+        ).length;
+
+      const rejected =
+        allEntries.filter(entry =>
+          String(entry.status || "")
+            .toUpperCase() === "REJECTED"
+        ).length;
+
+      document.getElementById(
+        "totalEntries"
+      ).textContent = total;
+
+      document.getElementById(
+        "allowedEntries"
+      ).textContent = allowed;
+
+      document.getElementById(
+        "rejectedEntries"
+      ).textContent = rejected;
+    }
+
+    /* =========================
+       RENDER ENTRIES
+    ========================== */
+
+    function renderEntries(entries) {
+
+      const tbody =
+        document.getElementById(
+          "entriesTableBody"
+        );
+
+      const sorted =
+        [...entries]
+          .sort(
+            (a, b) =>
+              getTimestamp(b) -
+              getTimestamp(a)
+          )
+          .slice(0, 15);
+
+      if (!sorted.length) {
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                No entry records found.
+              </div>
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+      tbody.innerHTML =
+        sorted.map(entry => {
+
+          const name =
+            entry.studentName ||
+            entry.name ||
+            "Unknown Student";
+
+          const studentId =
+            entry.studentId ||
+            entry.id ||
+            "-";
+
+          const status =
+            String(
+              entry.status ||
+              "UNKNOWN"
+            ).toUpperCase();
+
+          const verifier =
+            entry.verifiedByName ||
+            entry.verifiedBy ||
+            "-";
+
+          const allowed =
+            status === "ALLOWED";
+
+          return `
+            <tr>
+
+              <td>
+
+                <div class="student-cell">
+
+                  <div class="student-avatar">
+                    ${escapeHtml(
+                      getInitials(name)
+                    )}
+                  </div>
+
+                  <div>
+
+                    <div class="student-name">
+                      ${escapeHtml(name)}
+                    </div>
+
+                    <div class="student-id">
+                      ${escapeHtml(studentId)}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span class="badge-status ${
+                  allowed
+                    ? "allowed"
+                    : "rejected"
+                }">
+
+                  <i class="bi ${
+                    allowed
+                      ? "bi-check-circle-fill"
+                      : "bi-x-circle-fill"
+                  }"></i>
+
+                  ${escapeHtml(status)}
+
+                </span>
+
+              </td>
+
+              <td>
+                ${escapeHtml(verifier)}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  formatDate(
+                    entry.createdAt ||
+                    entry.timestamp ||
+                    entry.date
+                  )
+                )}
+              </td>
+
+            </tr>
+          `;
+
+        }).join("");
+    }
+
+    /* =========================
+       SEARCH
+    ========================== */
+
+    document
+      .getElementById("searchInput")
+      .addEventListener(
+        "input",
+        function () {
+
+          const query =
+            this.value
+              .trim()
+              .toLowerCase();
+
+          if (!query) {
+            renderEntries(allEntries);
+            return;
+          }
+
+          const filtered =
+            allEntries.filter(entry => {
+
+              const searchable = [
+                entry.studentName,
+                entry.name,
+                entry.studentId,
+                entry.status,
+                entry.verifiedBy,
+                entry.verifiedByName,
+                entry.dayKey
+              ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+              return searchable.includes(query);
+            });
+
+          renderEntries(filtered);
+        }
+      );
+
+    /* =========================
+       DATE
+    ========================== */
+
+    function setToday() {
+
+      const now = new Date();
+
+      document.getElementById(
+        "todayDate"
+      ).textContent =
+        now.toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short"
+          }
+        );
+    }
+
+    /* =========================
+       LOGOUT
+    ========================== */
+
+    document
+      .getElementById("logoutBtn")
+      .addEventListener(
+        "click",
+        async function () {
+
+          try {
+
+            if (token) {
+              await api(
+                "/api/logout",
+                {
+                  method: "POST"
+                }
+              );
+            }
+
+          } catch (error) {
+            console.warn(
+              "Logout request failed:",
+              error
+            );
+          }
+
+          sessionStorage.removeItem(
+            "entrypass_token"
+          );
+
+          sessionStorage.removeItem(
+            "entrypass_user"
+          );
+
+          window.location.href =
+            "admin-login.html";
+        }
+      );
+
+    /* =========================
+       START
+    ========================== */
+
+    async function init() {
+
+      setToday();
+
+      await loadProfile();
+
+      try {
+        await Promise.all([
+          loadUsers(),
+          loadEntries()
+        ]);
+      } catch (error) {
+
+        console.error(
+          "Dashboard loading error:",
+          error
+        );
+
+        document.getElementById(
+          "entriesTableBody"
+        ).innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <i class="bi bi-cloud-slash"></i>
+                Unable to load dashboard data.
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
